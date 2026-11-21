@@ -40,7 +40,7 @@
 <a name="en-setup-and-usage-guide" id="en-setup-and-usage-guide"></a>
 # 🇬🇧 English: Setup and Usage Guide
 
-**Discord Soundboard** is a high-performance, native plugin for **Macro Deck 3**. It communicates directly with your running Discord desktop application to fetch all available soundboard sounds from your account and joined servers, letting you preview audio, organize favorites, and instantly export them as touch buttons on your Macro Deck.
+**Discord Soundboard** is a high-performance, native plugin for **Macro Deck 3**. It communicates directly with your running Discord desktop application to fetch all available soundboard sounds from your account and joined servers, letting you preview audio, organize favorites, and trigger them seamlessly from your Macro Deck touch buttons.
 
 ---
 
@@ -57,7 +57,8 @@
   - Filter by specific server or browse your personal favorites.
   - **Live Audio Preview:** Test and listen to sound clips in real time before creating buttons.
   - **Favorites System:** Star your go-to sounds to keep them at the top.
-- **⚡ 1-Click Macro Deck Export:** Select single or multiple sounds and export them directly into your current Macro Deck folder with custom emojis, colors, and auto-generated back buttons.
+  - **Play in Voice Chat:** Test-play sounds directly in your active Discord voice channel.
+- **⚡ Native Macro Deck 3 Integration:** Assign sounds to any button with the native "Play Discord Soundboard Sound" action. Dynamic options list your sounds, and official Discord emoji icons are applied automatically!
 - **🌍 Dual-Language Support:** Fully localized in **English** 🇬🇧 and **Türkçe** 🇹🇷 with an instant language toggle.
 - **📱 Hardware & Touch Compatible:** Works across Macro Deck Windows client, Android, iOS, and Web deck clients.
 
@@ -116,11 +117,10 @@
 
 ## 🎮 How to Use
 
-1. **Launch Discord:** Ensure Discord Desktop is open and logged into your account.
-2. **Open Soundboard Manager:** In Macro Deck, add the **"Open Soundboard Manager"** action to any button (or click it from the plugin settings).
-3. **Filter & Select:** Search for sounds, preview audio, or filter by server.
-4. **Export to Deck:** Choose your target deck folder and click **"Export Selected to Macro Deck"**.
-5. **Blast Sounds in Voice Chat:** Join any Discord voice channel and tap your Macro Deck buttons to play sounds instantly!
+1. **Launch Discord:** Ensure Discord Desktop is open and connected to your account.
+2. **Assign to Buttons:** In Macro Deck, click any button → **Add Action** → **Discord Soundboard** → Select **Play Discord Soundboard Sound** and pick your favorite sound. The official emoji icon will automatically be applied to your button!
+3. **Open Soundboard Manager:** Use the visual Soundboard Manager window to explore all sounds, filter by Discord server, listen to live audio previews, and manage favorites.
+4. **Blast Sounds in Voice Chat:** Join any Discord voice channel and tap your Macro Deck buttons to play sounds instantly!
 
 ---
 
@@ -128,8 +128,8 @@
 
 | Action | Description |
 | :--- | :--- |
-| **Play Discord Soundboard Sound** | Triggers a specific Discord soundboard sound by ID and Guild ID directly in your active voice channel. |
-| **Open Soundboard Manager** | Opens the visual Soundboard Manager window to browse, preview, and batch-export sounds. |
+| **Play Discord Soundboard Sound** | Triggers a specific Discord soundboard sound in your active voice channel with dynamic choices and automatic emoji icons. |
+| **Open Soundboard Manager** | Opens the visual Soundboard Manager window to browse, preview audio, and filter sounds by Discord server. |
 
 ---
 
@@ -161,9 +161,10 @@ To remove the plugin:
   - Modern ve şık Edge WebView2 arayüzü ile çalışır.
   - Ses adı veya sunucu adına göre anlık arama yapabilme.
   - Sunucuya göre filtreleme ve favoriler sekmesi.
-  - **Canlı Ses Önizleme:** Buton oluşturmadan önce sesi tek tıkla canlı olarak dinleme.
+  - **Canlı Ses Önizleme:** Sesi tarayıcıda tek tıkla canlı olarak dinleme.
+  - **Seste Çal:** Sesi Discord ses kanalınızda doğrudan test etme.
   - **Favoriler Sistemi:** Sık kullandığınız sesleri yıldızlayarak her zaman elinizin altında tutma.
-- **⚡ Tek Tıkla Macro Deck'e Aktarım:** Seçtiğiniz sesleri, özel emoji simgeleri, renkleri ve üst klasöre dönüş tuşlarıyla birlikte otomatik olarak Macro Deck butonlarına dönüştürür.
+- **⚡ Yerel Macro Deck 3 Entegrasyonu:** İstediğiniz tuşa "Play Discord Soundboard Sound" eylemini atayın; açılan listeden sesi seçtiğinizde buton simgesi ve Discord emojisi otomatik uygulanır.
 - **🌍 Çift Dil Desteği:** Dahili **Türkçe** 🇹🇷 ve **İngilizce** 🇬🇧 dil seçeneği (sağ üst menüden anında değiştirilebilir).
 - **📱 Donanım ve Dokunmatik Uyumlu:** Macro Deck Windows, Android, iOS ve Web kumandalarıyla tam uyumlu çalışır.
 
@@ -222,11 +223,10 @@ To remove the plugin:
 
 ## 🎮 Nasıl Kullanılır?
 
-1. **Discord'u Açın:** Discord masaüstü uygulamanızın açık ve hesabınızın giriş yapmış olduğundan emin olun.
-2. **Yöneticiyi Başlatın:** Macro Deck'te herhangi bir butona **"Open Soundboard Manager"** aksiyonunu atayın veya eklenti ayarlarından paneli açın.
-3. **Filtreleyin ve Seçin:** İstediğiniz sesleri arayın, önizleme ile dinleyin ve aktarmak istediklerinizi işaretleyin.
-4. **Macro Deck'e Aktarın:** Hedef klasörünüzü seçip **"Export Selected to Macro Deck"** butonuna basın.
-5. **Ses Kanalında Çalın:** Herhangi bir Discord ses kanalındayken Macro Deck tuşlarınıza basarak sesleri anında sohbete gönderin!
+1. **Discord'u Açın:** Discord masaüstü uygulamanızın açık ve ses kanalına bağlanabilir olduğundan emin olun.
+2. **Tuşlara Atayın:** Macro Deck'te herhangi bir butona tıklayın ➔ **Action Ekle** ➔ **Discord Soundboard** ➔ **Play Discord Soundboard Sound** seçin ve istediğiniz sesi listeden belirleyin. Sesin resmi emojisi butona otomatik atanır!
+3. **Yöneticiyi Başlatın:** Sesleri canlı dinlemek, sunucuya göre filtrelemek ve favorilerinizi yönetmek için görsel Soundboard Manager'ı kullanın.
+4. **Ses Kanalında Çalın:** Herhangi bir Discord ses kanalındayken Macro Deck tuşlarınıza basarak sesleri anında sohbete gönderin!
 
 ---
 
@@ -234,8 +234,8 @@ To remove the plugin:
 
 | Eylem | Açıklama |
 | :--- | :--- |
-| **Play Discord Soundboard Sound** | Belirtilen Sound ID ve Guild ID'ye sahip sesi doğrudan aktif ses kanalınızda çalar. |
-| **Open Soundboard Manager** | Sesleri aramak, filtrelemek, dinlemek ve topluca aktarmak için görsel yönetim panelini açar. |
+| **Play Discord Soundboard Sound** | Belirtilen sesi doğrudan aktif ses kanalınızda çalar; buton simgesini ve emojisini otomatik belirler. |
+| **Open Soundboard Manager** | Sesleri aramak, filtrelemek, dinlemek ve favorileri düzenlemek için görsel yönetim panelini açar. |
 
 ---
 

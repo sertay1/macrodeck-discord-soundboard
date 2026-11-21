@@ -20,7 +20,7 @@ public sealed class OpenManagerAction : IActionDefinition
 
 	public LocalizedText Name => LocalizedText.FromLiteral("Open Soundboard Manager");
 
-	public LocalizedText Description => LocalizedText.FromLiteral("Opens the visual soundboard browser with sound search, preview player, and bulk button export.");
+	public LocalizedText Description => LocalizedText.FromLiteral("Opens the visual soundboard browser with sound search, audio preview, and server filtering.");
 
 	public IReadOnlyList<ActionParameter> Parameters => [];
 
