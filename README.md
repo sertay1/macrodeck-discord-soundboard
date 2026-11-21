@@ -1,4 +1,4 @@
-# <div align="center">Discord Soundboard for Macro Deck 3</div>
+# <div align="center">Discord Soundboard for Macro Deck</div>
 
 <p align="center">
   <img src="src/DiscordSoundboard/Assets/icon.svg" alt="Discord Soundboard Logo" width="128" height="128">
