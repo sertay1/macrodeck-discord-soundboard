@@ -16,6 +16,15 @@
   <img src="https://img.shields.io/badge/License-MIT-green" alt="License: MIT">
 </p>
 
+<p align="center">
+  <a href="https://macro-deck.app/store/com.sertaycil.discord-soundboard">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://assets.macro-deck.app/branding/Open%20in%20the%20Macro%20Deck%20Store%20Badge%20Dark.png">
+      <img alt="Open in the Macro Deck Store" src="https://assets.macro-deck.app/branding/Open%20in%20the%20Macro%20Deck%20Store%20Badge%20Light.png" height="56">
+    </picture>
+  </a>
+</p>
+
 <div align="center">
   <a href="#en-setup-and-usage-guide" style="text-decoration:none;"><img src="https://img.shields.io/badge/Language-English-blue?style=for-the-badge" alt="English"></a> &nbsp;&nbsp; <a href="#tr-kurulum-ve-kullanım-rehberi" style="text-decoration:none;"><img src="https://img.shields.io/badge/Dil-Türkçe-red?style=for-the-badge" alt="Türkçe"></a>
 </div>
@@ -66,6 +75,13 @@
 ## 🚀 Installation
 
 ### Option 1: Macro Deck Extension Store (Recommended ⭐)
+
+<a href="https://macro-deck.app/store/com.sertaycil.discord-soundboard">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://assets.macro-deck.app/branding/Open%20in%20the%20Macro%20Deck%20Store%20Badge%20Dark.png">
+    <img alt="Open in the Macro Deck Store" src="https://assets.macro-deck.app/branding/Open%20in%20the%20Macro%20Deck%20Store%20Badge%20Light.png" height="48">
+  </picture>
+</a>
 
 1. Open **Macro Deck 3**.
 2. Click the **Extension Store** icon on the sidebar.
@@ -165,6 +181,13 @@ To remove the plugin:
 ## 🚀 Kurulum Seçenekleri
 
 ### 1. Seçenek: Macro Deck Eklenti Mağazası (Tavsiye Edilen ⭐)
+
+<a href="https://macro-deck.app/store/com.sertaycil.discord-soundboard">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://assets.macro-deck.app/branding/Open%20in%20the%20Macro%20Deck%20Store%20Badge%20Dark.png">
+    <img alt="Open in the Macro Deck Store" src="https://assets.macro-deck.app/branding/Open%20in%20the%20Macro%20Deck%20Store%20Badge%20Light.png" height="48">
+  </picture>
+</a>
 
 1. **Macro Deck 3** uygulamasını açın.
 2. Sol menüdeki **Eklenti Mağazası (Extension Store)** simgesine tıklayın.
