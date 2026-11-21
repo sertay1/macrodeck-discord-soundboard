@@ -327,10 +327,11 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
 				using var doc = JsonDocument.Parse(body);
 				var soundId = doc.RootElement.TryGetProperty("soundId", out var sidProp) ? sidProp.GetString() : null;
 				var guildId = doc.RootElement.TryGetProperty("guildId", out var gidProp) ? gidProp.GetString() : null;
+				double? volume = doc.RootElement.TryGetProperty("volume", out var volProp) && volProp.TryGetDouble(out var v) ? v : null;
 
 				if (!string.IsNullOrEmpty(soundId))
 				{
-					var success = await _discordClient.PlaySoundAsync(soundId, guildId);
+					var success = await _discordClient.PlaySoundAsync(soundId, guildId, volume);
 					await SendJsonResponseAsync(resp, JsonSerializer.Serialize(new { success }));
 				}
 				else
@@ -1451,7 +1452,11 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
                     try {
                         const res = await apiFetch('/api/play', {
                             method: 'POST',
-                            body: JSON.stringify({ soundId: s.sound_id, guildId: s.guild_id || null })
+                            body: JSON.stringify({
+                                soundId: s.sound_id,
+                                guildId: s.guild_id || null,
+                                volume: isMuted ? 0.0 : (previewVolume / 100)
+                            })
                         });
                         const data = await res.json();
                         if (data.success) {

@@ -25,7 +25,15 @@ public sealed class PlaySoundAction : IActionDefinition, IDynamicOptionsActionDe
 				description: Strings.Actions.PlaySound.Sound.Description(),
 				optionsSourceId: null!,
 				placeholder: Strings.Actions.PlaySound.Sound.Placeholder(),
-				required: true)
+				required: true),
+			ActionParameter.Slider(
+				"volume",
+				0,
+				100,
+				label: LocalizedText.FromLiteral("Volume (%)"),
+				description: LocalizedText.FromLiteral("Playback volume (0-100%). Default is 100%."),
+				step: 5,
+				defaultValue: 100)
 		];
 	}
 
@@ -209,7 +217,16 @@ public sealed class PlaySoundAction : IActionDefinition, IDynamicOptionsActionDe
 			var sound = _discordClient.Sounds.FirstOrDefault(s => s.SoundId == soundId);
 			var guildId = sound?.GuildId;
 
-			var success = await _discordClient.PlaySoundAsync(soundId, guildId, context.CancellationToken);
+			double? volumeScale = null;
+			if (context.Parameters.TryGetValue("volume", out var volObj) && volObj != null)
+			{
+				if (double.TryParse(volObj.ToString(), out var volNum))
+				{
+					volumeScale = Math.Clamp(volNum / 100.0, 0.0, 1.0);
+				}
+			}
+
+			var success = await _discordClient.PlaySoundAsync(soundId, guildId, volumeScale, context.CancellationToken);
 			if (!success)
 			{
 				return ActionResult.Failed(

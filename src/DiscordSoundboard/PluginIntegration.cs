@@ -19,6 +19,7 @@ public sealed class PluginIntegration : IPluginIntegration, IConfigFlowProvider
 		Actions =
 		[
 			new PlaySoundAction(discordClient, logger),
+			new PlayRandomSoundAction(discordClient, logger),
 			new OpenManagerAction(managerServer, logger)
 		];
 	}

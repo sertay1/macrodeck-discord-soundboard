@@ -405,7 +405,7 @@ public sealed class DiscordIpcClient : IAsyncDisposable
 		return Sounds;
 	}
 
-	public async Task<bool> PlaySoundAsync(string soundId, string? guildId = null, CancellationToken cancellationToken = default)
+	public async Task<bool> PlaySoundAsync(string soundId, string? guildId = null, double? volume = null, CancellationToken cancellationToken = default)
 	{
 		if (!IsConnected || !IsAuthenticated)
 		{
@@ -420,14 +420,21 @@ public sealed class DiscordIpcClient : IAsyncDisposable
 		}
 
 		var nonce = Guid.NewGuid().ToString("N");
+		var argsObj = new JsonObject
+		{
+			["sound_id"] = soundId,
+			["guild_id"] = guildId
+		};
+
+		if (volume.HasValue)
+		{
+			argsObj["volume"] = Math.Round(Math.Clamp(volume.Value, 0.0, 1.0), 2);
+		}
+
 		var payload = new JsonObject
 		{
 			["cmd"] = "PLAY_SOUNDBOARD_SOUND",
-			["args"] = new JsonObject
-			{
-				["sound_id"] = soundId,
-				["guild_id"] = guildId
-			},
+			["args"] = argsObj,
 			["nonce"] = nonce
 		};
 

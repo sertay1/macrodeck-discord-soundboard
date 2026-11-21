@@ -19,13 +19,34 @@ public sealed class PluginIntegrationTests
 			.RegisterIntegration<PluginIntegration>());
 
 	[Test]
-	public void Inspect_ActionExecutionContext()
+	public void The_action_parameter_has_definitions()
 	{
-		var t = typeof(MacroDeck.Sdk.Actions.ActionExecutionContext);
-		foreach (var p in t.GetProperties())
-		{
-			TestContext.Out.WriteLine($"Prop: {p.PropertyType.FullName} {p.Name}");
-		}
+		var playSound = new PlaySoundAction(new DiscordIpcClient(Serilog.Log.Logger), Serilog.Log.Logger);
+		Assert.That(playSound.Parameters, Is.Not.Empty);
+	}
+
+	[Test]
+	public async Task The_play_random_sound_action_has_pool_options()
+	{
+		await using var harness = CreateHarness();
+		await harness.InitializeIntegrationsAsync();
+
+		var client = harness.Services.GetRequiredService<DiscordIpcClient>();
+		client.Sounds.Add(new DiscordSound { SoundId = "123", Name = "Airhorn", EmojiName = "📢", GuildId = "999", GuildName = "CoolServer" });
+
+		var randomAction = new PlayRandomSoundAction(client, Serilog.Log.Logger);
+		var result = await randomAction.GetDynamicOptionsAsync(
+			new DynamicOptionsContext
+			{
+				ParameterName = "pool",
+				CurrentParameters = new Dictionary<string, object?>()
+			},
+			CancellationToken.None);
+
+		Assert.That(result.Options, Is.Not.Empty);
+		Assert.That(result.Options.Any(o => o.Value == "all"), Is.True);
+		Assert.That(result.Options.Any(o => o.Value == "favorites"), Is.True);
+		Assert.That(result.Options.Any(o => o.Value == "guild:999"), Is.True);
 	}
 
 	[Test]
