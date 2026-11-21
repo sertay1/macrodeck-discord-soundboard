@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "include": [
+    "Assets/icon.svg"
+  ],
+  "targets": {
+    "win-x64": {
+      "executable": "dotnet",
+      "arguments": [
+        "publish",
+        "DiscordSoundboard.csproj",
+        "-c",
+        "Release",
+        "-r",
+        "win-x64",
+        "--self-contained",
+        "false",
+        "-p:UseAppHost=false",
+        "-o",
+        "bin/publish/win-x64"
+      ],
+      "output": "bin/publish/win-x64"
+    }
+  }
+}

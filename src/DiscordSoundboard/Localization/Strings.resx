@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Actions.PlaySound.Name" xml:space="preserve">
+    <value>Play Sound</value>
+  </data>
+  <data name="Actions.PlaySound.Description" xml:space="preserve">
+    <value>Plays a soundboard sound in your active Discord voice channel.</value>
+  </data>
+  <data name="Actions.PlaySound.Sound.Label" xml:space="preserve">
+    <value>Sound</value>
+  </data>
+  <data name="Actions.PlaySound.Sound.Description" xml:space="preserve">
+    <value>Select the Discord soundboard sound to play.</value>
+  </data>
+  <data name="Actions.PlaySound.Sound.Placeholder" xml:space="preserve">
+    <value>Select a sound...</value>
+  </data>
+  <data name="ConfigFlow.Step.Title" xml:space="preserve">
+    <value>Discord App Credentials</value>
+  </data>
+  <data name="ConfigFlow.Step.Description" xml:space="preserve">
+    <value>Enter your Discord Application Client ID and Client Secret.</value>
+  </data>
+  <data name="ConfigFlow.ClientId.Label" xml:space="preserve">
+    <value>Client ID</value>
+  </data>
+  <data name="ConfigFlow.ClientId.Description" xml:space="preserve">
+    <value>The Application ID from your Discord Developer Portal app.</value>
+  </data>
+  <data name="ConfigFlow.ClientId.Placeholder" xml:space="preserve">
+    <value>e.g. 123456789012345678</value>
+  </data>
+  <data name="ConfigFlow.ClientSecret.Label" xml:space="preserve">
+    <value>Client Secret</value>
+  </data>
+  <data name="ConfigFlow.ClientSecret.Description" xml:space="preserve">
+    <value>The OAuth2 Client Secret from your Discord Developer Portal app.</value>
+  </data>
+  <data name="ConfigFlow.ClientSecret.Placeholder" xml:space="preserve">
+    <value>Paste your client secret here</value>
+  </data>
+  <data name="ConfigFlow.Instruction" xml:space="preserve">
+    <value>1. Go to the Discord Developer Portal and create a New Application.
+2. Under OAuth2, make sure https://localhost/ is added to Redirects.
+3. Copy your Client ID and Client Secret into the fields below and click Connect.</value>
+  </data>
+</root>

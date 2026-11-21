@@ -1,0 +1,20 @@
+{
+  "$schema": "https://schemas.macro-deck.app/plugin-manifest-v1.schema.json",
+  "manifestVersion": 1,
+  "id": "com.sertaycil.discord-soundboard",
+  "name": "Discord Soundboard",
+  "version": "1.0.0",
+  "description": "Play Discord soundboard sounds directly from Macro Deck with automatic sound discovery, server filtering, and visual soundboard manager.",
+  "icon": "icon.svg",
+  "entrypoints": {
+    "win-x64": { "executable": "runtimes/win-x64/DiscordSoundboard.dll", "runtime": { "kind": "FrameworkDependent", "dotnetVersion": "10.0" } }
+  },
+  "publisher": {
+    "name": "SertAy"
+  },
+  "license": "MIT",
+  "repository": "https://github.com/sertay/macrodeck-discord-soundboard",
+  "compatibility": {
+    "macroDeck": ">=3.0.0-0"
+  }
+}
