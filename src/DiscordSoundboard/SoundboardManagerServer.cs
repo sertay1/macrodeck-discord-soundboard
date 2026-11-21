@@ -327,10 +327,11 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
 				using var doc = JsonDocument.Parse(body);
 				var soundId = doc.RootElement.TryGetProperty("soundId", out var sidProp) ? sidProp.GetString() : null;
 				var guildId = doc.RootElement.TryGetProperty("guildId", out var gidProp) ? gidProp.GetString() : null;
+				double? volume = doc.RootElement.TryGetProperty("volume", out var volProp) && volProp.TryGetDouble(out var v) ? v : null;
 
 				if (!string.IsNullOrEmpty(soundId))
 				{
-					var success = await _discordClient.PlaySoundAsync(soundId, guildId);
+					var success = await _discordClient.PlaySoundAsync(soundId, guildId, volume);
 					await SendJsonResponseAsync(resp, JsonSerializer.Serialize(new { success }));
 				}
 				else
@@ -523,6 +524,70 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
             0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(35, 165, 90, 0.7); }
             70% { transform: scale(1.1); box-shadow: 0 0 0 6px rgba(35, 165, 90, 0); }
             100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(35, 165, 90, 0); }
+        }
+
+        /* Volume Slider Control */
+        .volume-control {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+        .btn-mute {
+            background: transparent;
+            border: none;
+            color: var(--muted);
+            cursor: pointer;
+            font-size: 14px;
+            padding: 0;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            transition: color 0.15s;
+            outline: none;
+        }
+        .btn-mute:hover { color: var(--text); }
+        .vol-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--muted);
+        }
+        .volume-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 85px;
+            height: 6px;
+            border-radius: 3px;
+            background: #2b2e35;
+            outline: none;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--accent);
+            cursor: pointer;
+            box-shadow: 0 0 8px var(--accent-glow);
+            transition: transform 0.15s;
+        }
+        .volume-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+        .volume-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            min-width: 32px;
+            text-align: right;
+            font-variant-numeric: tabular-nums;
         }
 
         /* Floating Action Dock */
@@ -1012,6 +1077,12 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
                     <div class="status-dot pulsing" id="statusDot"></div>
                     <span id="statusText">Connecting...</span>
                 </div>
+                <div class="volume-control" id="volControl" title="Preview Volume / Önizleme Sesi">
+                    <button type="button" class="btn-mute" id="btnMute" onclick="toggleMute()" title="Mute/Unmute">🔊</button>
+                    <span class="vol-label" id="txtVolLabel">Volume:</span>
+                    <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="75" oninput="onVolumeChange(this.value)">
+                    <span class="volume-label" id="volumeLabel">75%</span>
+                </div>
                 <div class="lang-switch" role="group" aria-label="Language">
                     <button type="button" class="lang-btn" id="btnLangTR" onclick="setLanguage('tr')">TR</button>
                     <button type="button" class="lang-btn active" id="btnLangEN" onclick="setLanguage('en')">EN</button>
@@ -1132,6 +1203,7 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
                 serverSoundCount: (name, count) => `${name} (${count} sounds)`,
                 defaultGuildName: "Discord (Default)",
                 serverFallback: (id) => `Server (${id})`,
+                volLabel: "Volume:",
                 btnRandom: "Surprise Me",
                 toastRandomPlayed: (name) => `Playing random sound: "${name}" 🎲`
             },
@@ -1174,6 +1246,7 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
                 serverSoundCount: (name, count) => `${name} (${count} ses)`,
                 defaultGuildName: "Discord (Varsayılan)",
                 serverFallback: (id) => `Sunucu (${id})`,
+                volLabel: "Ses:",
                 btnRandom: "Rastgele Çal",
                 toastRandomPlayed: (name) => `Rastgele çalınıyor: "${name}" 🎲`
             }
@@ -1462,7 +1535,8 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
                             method: 'POST',
                             body: JSON.stringify({
                                 soundId: s.sound_id,
-                                guildId: s.guild_id || null
+                                guildId: s.guild_id || null,
+                                volume: isMuted ? 0.0 : (previewVolume / 100)
                             })
                         });
                         const data = await res.json();
@@ -1538,6 +1612,7 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
 
                 const url = `https://cdn.discordapp.com/soundboard-sounds/${encodeURIComponent(s.sound_id)}`;
                 currentAudio = new Audio(url);
+                currentAudio.volume = isMuted ? 0 : (previewVolume / 100);
                 playingSoundId = s.sound_id;
                 btn.textContent = t('previewStopBtn');
                 btn.classList.add('playing');
@@ -1571,6 +1646,50 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
                 });
             } catch (err) {
                 console.error(err);
+            }
+        }
+
+        // Preview Volume Control
+        let previewVolume = parseInt(localStorage.getItem('sfx_volume') || '75', 10);
+        let isMuted = false;
+        let prevUnmutedVolume = previewVolume > 0 ? previewVolume : 75;
+
+        function onVolumeChange(val) {
+            previewVolume = parseInt(val, 10);
+            localStorage.setItem('sfx_volume', previewVolume);
+            isMuted = previewVolume === 0;
+            updateVolumeUI();
+            if (currentAudio) {
+                currentAudio.volume = isMuted ? 0 : (previewVolume / 100);
+            }
+        }
+
+        function toggleMute() {
+            if (isMuted) {
+                previewVolume = prevUnmutedVolume > 0 ? prevUnmutedVolume : 75;
+                isMuted = false;
+            } else {
+                prevUnmutedVolume = previewVolume > 0 ? previewVolume : 75;
+                previewVolume = 0;
+                isMuted = true;
+            }
+            localStorage.setItem('sfx_volume', previewVolume);
+            updateVolumeUI();
+            if (currentAudio) {
+                currentAudio.volume = isMuted ? 0 : (previewVolume / 100);
+            }
+        }
+
+        function updateVolumeUI() {
+            const slider = document.getElementById('volumeSlider');
+            const label = document.getElementById('volumeLabel');
+            const muteBtn = document.getElementById('btnMute');
+            if (slider) slider.value = previewVolume;
+            if (label) label.textContent = `${previewVolume}%`;
+            if (muteBtn) {
+                if (previewVolume === 0) muteBtn.textContent = '🔇';
+                else if (previewVolume < 40) muteBtn.textContent = '🔉';
+                else muteBtn.textContent = '🔊';
             }
         }
 
@@ -1648,8 +1767,10 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
             document.getElementById('txtFilterFavs').textContent = t('favsFilter');
             document.getElementById('txtFilterDefault').textContent = t('defaultFilter');
             document.getElementById('txtFabRandom').textContent = t('btnRandom');
+            document.getElementById('txtVolLabel').textContent = t('volLabel');
             document.getElementById('searchInput').placeholder = t('searchPlaceholder');
 
+            updateVolumeUI();
             updateStatusBadge();
             populateServerDropdown();
             renderGrid();
