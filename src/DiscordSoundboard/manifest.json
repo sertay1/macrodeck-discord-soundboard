@@ -10,7 +10,7 @@
     "win-x64": { "executable": "runtimes/win-x64/DiscordSoundboard.dll", "runtime": { "kind": "FrameworkDependent", "dotnetVersion": "10.0" } }
   },
   "publisher": {
-    "name": "SertAy"
+    "name": "Sertay Çil"
   },
   "license": "MIT",
   "repository": "https://github.com/sertay1/macrodeck-discord-soundboard",
