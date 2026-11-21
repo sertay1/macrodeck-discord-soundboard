@@ -12,7 +12,7 @@
   <img src="https://img.shields.io/badge/Macro%20Deck-%3E%3D3.0.0-5865F2?logo=discord" alt="Macro Deck 3">
   <img src="https://img.shields.io/badge/.NET-10.0-512bd4?logo=dotnet" alt=".NET 10.0">
   <img src="https://img.shields.io/badge/Platform-Windows-0078D6?logo=windows" alt="Windows">
-  <img src="https://img.shields.io/badge/Version-v1.0.0-759a20" alt="Version 1.0.0">
+  <img src="https://img.shields.io/badge/Version-v1.0.1-759a20" alt="Version 1.0.1">
   <img src="https://img.shields.io/badge/License-MIT-green" alt="License: MIT">
 </p>
 
@@ -94,7 +94,7 @@
 ### Option 2: Manual Package Installation (`.macroDeckPlugin`)
 
 1. Go to the [Releases](https://github.com/sertay1/macrodeck-discord-soundboard/releases) page.
-2. Download the latest **`com.sertaycil.discord-soundboard-1.0.0.macroDeckPlugin`**.
+2. Download the latest **`com.sertaycil.discord-soundboard-1.0.1.macroDeckPlugin`**.
 3. Double-click the downloaded file (or drag and drop it into Macro Deck).
 4. Restart Macro Deck if prompted.
 
@@ -200,7 +200,7 @@ To remove the plugin:
 ### 2. Seçenek: Manuel Paket Kurulumu (`.macroDeckPlugin`)
 
 1. [Releases](https://github.com/sertay1/macrodeck-discord-soundboard/releases) sayfasına gidin.
-2. En güncel **`com.sertaycil.discord-soundboard-1.0.0.macroDeckPlugin`** dosyasını indirin.
+2. En güncel **`com.sertaycil.discord-soundboard-1.0.1.macroDeckPlugin`** dosyasını indirin.
 3. İndirdiğiniz dosyaya çift tıklayın (veya Macro Deck penceresine sürükleyip bırakın).
 4. İstenirse Macro Deck'i yeniden başlatın.
 

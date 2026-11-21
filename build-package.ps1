@@ -24,7 +24,7 @@ Copy-Item "$scriptDir\src\DiscordSoundboard\Assets\icon.svg" "$stagingDir\icon.s
 Copy-Item "$publishDir\*" "$stagingDir\runtimes\win-x64\" -Recurse
 
 Write-Host "4. Packing .macroDeckPlugin artifact..." -ForegroundColor Cyan
-$outputArtifact = "$scriptDir\com.sertaycil.discord-soundboard-1.0.0.macroDeckPlugin"
+$outputArtifact = "$scriptDir\com.sertaycil.discord-soundboard-1.0.1.macroDeckPlugin"
 macrodeck-plugin pack --source $stagingDir --output $outputArtifact --force
 
 Write-Host "5. Validating .macroDeckPlugin artifact..." -ForegroundColor Cyan

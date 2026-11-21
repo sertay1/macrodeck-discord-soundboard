@@ -3,7 +3,7 @@
   "manifestVersion": 1,
   "id": "com.sertaycil.discord-soundboard",
   "name": "Discord Soundboard",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Play Discord soundboard sounds directly from Macro Deck with automatic sound discovery, server filtering, and visual soundboard manager.",
   "icon": "icon.svg",
   "entrypoints": {
