@@ -26,15 +26,7 @@ public sealed class PlayRandomSoundAction : IActionDefinition, IDynamicOptionsAc
 				description: LocalizedText.FromLiteral("Choose whether to pick from all sounds, favorites only, or a specific server."),
 				optionsSourceId: null!,
 				placeholder: LocalizedText.FromLiteral("Select sound pool..."),
-				required: false),
-			ActionParameter.Slider(
-				VolumeParameter,
-				0,
-				100,
-				label: LocalizedText.FromLiteral("Volume (%)"),
-				description: LocalizedText.FromLiteral("Playback volume (0-100%). Default is 100%."),
-				step: 5,
-				defaultValue: 100)
+				required: false)
 		];
 	}
 
@@ -170,18 +162,9 @@ public sealed class PlayRandomSoundAction : IActionDefinition, IDynamicOptionsAc
 
 			var chosen = candidates[Random.Shared.Next(candidates.Count)];
 
-			double? volumeScale = null;
-			if (context.Parameters.TryGetValue(VolumeParameter, out var volObj) && volObj != null)
-			{
-				if (double.TryParse(volObj.ToString(), out var volNum))
-				{
-					volumeScale = Math.Clamp(volNum / 100.0, 0.0, 1.0);
-				}
-			}
-
 			_logger.Information("PlayRandomSoundAction playing random sound {Name} ({SoundId}) from pool {Pool}", chosen.Name, chosen.SoundId, poolSelection);
 
-			var success = await _discordClient.PlaySoundAsync(chosen.SoundId, chosen.GuildId, volumeScale, context.CancellationToken);
+			var success = await _discordClient.PlaySoundAsync(chosen.SoundId, chosen.GuildId, null, context.CancellationToken);
 			if (!success)
 			{
 				return ActionResult.Failed(

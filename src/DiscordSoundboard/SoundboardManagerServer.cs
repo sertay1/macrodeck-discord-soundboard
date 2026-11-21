@@ -533,7 +533,7 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
             gap: 8px;
             background: var(--surface);
             border: 1px solid var(--border);
-            padding: 5px 12px;
+            padding: 5px 14px;
             border-radius: 20px;
             font-size: 12px;
         }
@@ -551,11 +551,16 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
             outline: none;
         }
         .btn-mute:hover { color: var(--text); }
+        .vol-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--muted);
+        }
         .volume-slider {
             -webkit-appearance: none;
             appearance: none;
-            width: 75px;
-            height: 5px;
+            width: 85px;
+            height: 6px;
             border-radius: 3px;
             background: #2b2e35;
             outline: none;
@@ -565,12 +570,12 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
         .volume-slider::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
-            width: 13px;
-            height: 13px;
+            width: 14px;
+            height: 14px;
             border-radius: 50%;
             background: var(--accent);
             cursor: pointer;
-            box-shadow: 0 0 6px var(--accent-glow);
+            box-shadow: 0 0 8px var(--accent-glow);
             transition: transform 0.15s;
         }
         .volume-slider::-webkit-slider-thumb:hover {
@@ -580,9 +585,74 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
             font-size: 11px;
             font-weight: 700;
             color: var(--text-secondary);
-            min-width: 28px;
+            min-width: 32px;
             text-align: right;
             font-variant-numeric: tabular-nums;
+        }
+
+        /* Floating Action Dock */
+        .floating-dock {
+            position: fixed;
+            bottom: 24px;
+            right: 28px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 999;
+        }
+        .btn-fab {
+            border: none;
+            cursor: pointer;
+            border-radius: 30px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+            transition: all 0.22s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            outline: none;
+        }
+        .btn-fab:hover {
+            transform: translateY(-3px) scale(1.04);
+        }
+        .btn-fab:active {
+            transform: translateY(0) scale(0.97);
+        }
+        .btn-fab-random {
+            background: linear-gradient(135deg, #5865F2, #3c45a5);
+            color: #ffffff;
+            padding: 12px 20px;
+            font-size: 13px;
+            font-weight: 700;
+            gap: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 6px 22px rgba(88, 101, 242, 0.45);
+        }
+        .btn-fab-random:hover {
+            box-shadow: 0 8px 28px rgba(88, 101, 242, 0.65);
+            background: linear-gradient(135deg, #6975f5, #4752c4);
+        }
+        .btn-fab-top {
+            width: 44px;
+            height: 44px;
+            background: #1e2026;
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-size: 14px;
+            font-weight: bold;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(12px);
+            transition: all 0.22s ease;
+        }
+        .btn-fab-top.visible {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+        .btn-fab-top:hover {
+            background: #2b2e36;
+            border-color: #5865F2;
+            color: #5865F2;
         }
 
         /* Language Switcher Segmented Control */
@@ -1009,6 +1079,7 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
                 </div>
                 <div class="volume-control" id="volControl" title="Preview Volume / Önizleme Sesi">
                     <button type="button" class="btn-mute" id="btnMute" onclick="toggleMute()" title="Mute/Unmute">🔊</button>
+                    <span class="vol-label" id="txtVolLabel">Volume:</span>
                     <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="75" oninput="onVolumeChange(this.value)">
                     <span class="volume-label" id="volumeLabel">75%</span>
                 </div>
@@ -1056,9 +1127,6 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
                 <div class="filter-chip" data-filter="default" onclick="setFilter('default')">
                     <span id="txtFilterDefault">🔊 Discord Default</span> <span class="count-pill" id="countDefault">0</span>
                 </div>
-                <button type="button" class="filter-chip" id="btnRandom" onclick="playRandomPreview()" style="border-style: dashed; cursor: pointer;">
-                    <span id="txtBtnRandom">🎲 Surprise Me</span>
-                </button>
             </div>
             <div class="filter-right">
                 <select class="server-dropdown" id="serverSelect" onchange="onServerSelectChange(this.value)">
@@ -1074,12 +1142,23 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
 
         <div class="sound-grid" id="soundGrid">
             <div style="color: var(--muted); grid-column: 1 / -1; text-align: center; padding: 50px;" id="txtGridLoading">
-                Sesler yükleniyor...
+                Sounds loading...
             </div>
         </div>
     </div>
 
-    <div class="toast" id="toast">Bildirim</div>
+    <!-- Floating Dock for Surprise Me & Scroll to Top -->
+    <div class="floating-dock">
+        <button type="button" class="btn-fab btn-fab-top" id="btnScrollTop" onclick="scrollToTop()" title="Scroll to Top">
+            ▲
+        </button>
+        <button type="button" class="btn-fab btn-fab-random" id="btnFabRandom" onclick="playRandomPreview()" title="Surprise Me">
+            <span>🎲</span>
+            <span id="txtFabRandom">Surprise Me</span>
+        </button>
+    </div>
+
+    <div class="toast" id="toast">Notification</div>
 
     <script>
         window.__SESSION_TOKEN__ = "{{sessionToken}}";
@@ -1124,7 +1203,8 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
                 serverSoundCount: (name, count) => `${name} (${count} sounds)`,
                 defaultGuildName: "Discord (Default)",
                 serverFallback: (id) => `Server (${id})`,
-                btnRandom: "🎲 Surprise Me",
+                volLabel: "Volume:",
+                btnRandom: "Surprise Me",
                 toastRandomPlayed: (name) => `Playing random sound: "${name}" 🎲`
             },
             tr: {
@@ -1166,7 +1246,8 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
                 serverSoundCount: (name, count) => `${name} (${count} ses)`,
                 defaultGuildName: "Discord (Varsayılan)",
                 serverFallback: (id) => `Sunucu (${id})`,
-                btnRandom: "🎲 Rastgele Çal",
+                volLabel: "Ses:",
+                btnRandom: "Rastgele Çal",
                 toastRandomPlayed: (name) => `Rastgele çalınıyor: "${name}" 🎲`
             }
         };
@@ -1656,6 +1737,21 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
             applyI18n();
         }
 
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        window.addEventListener('scroll', () => {
+            const topBtn = document.getElementById('btnScrollTop');
+            if (topBtn) {
+                if (window.scrollY > 150) {
+                    topBtn.classList.add('visible');
+                } else {
+                    topBtn.classList.remove('visible');
+                }
+            }
+        });
+
         function applyI18n() {
             document.getElementById('txtTitle').textContent = t('title');
             document.getElementById('txtSubtitle').textContent = t('subtitle');
@@ -1670,7 +1766,8 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
             document.getElementById('txtFilterAll').textContent = t('allFilter');
             document.getElementById('txtFilterFavs').textContent = t('favsFilter');
             document.getElementById('txtFilterDefault').textContent = t('defaultFilter');
-            document.getElementById('txtBtnRandom').textContent = t('btnRandom');
+            document.getElementById('txtFabRandom').textContent = t('btnRandom');
+            document.getElementById('txtVolLabel').textContent = t('volLabel');
             document.getElementById('searchInput').placeholder = t('searchPlaceholder');
 
             updateVolumeUI();
