@@ -4,6 +4,8 @@
 [![Macro Deck: >=3.0.0](https://img.shields.io/badge/Macro%20Deck-%3E%3D3.0.0-5865F2.svg)](https://macro-deck.app)
 [![.NET 10](https://img.shields.io/badge/.NET-10.0-512bd4.svg)](https://dotnet.microsoft.com)
 
+![Discord Soundboard for Macro Deck](docs/screenshots/01_discord_soundboard_showcase.png)
+
 A high-performance, native Macro Deck 3 plugin that connects to your local Discord client to play Soundboard sounds directly from your Deck buttons. Includes an embedded, interactive visual **Soundboard Manager** window for searching, filtering, previewing, and batch-exporting sounds to any folder.
 
 ---
