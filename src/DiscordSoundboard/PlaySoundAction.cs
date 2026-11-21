@@ -102,21 +102,56 @@ public sealed class PlaySoundAction : IActionDefinition, IDynamicOptionsActionDe
 			sounds = (await _discordClient.FetchSoundsAsync(cancellationToken)).ToList();
 		}
 
-		var options = sounds
-			.OrderBy(s => string.IsNullOrEmpty(s.GuildName) || s.GuildId == "0" ? " 0_Discord" : s.GuildName)
-			.ThenBy(s => s.Name, StringComparer.CurrentCultureIgnoreCase)
-			.Select(s =>
+		HashSet<string> favorites = [];
+		try
+		{
+			var appData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+			var favPath = Path.Combine(appData, "MacroDeck", "plugins", "com.sertaycil.discord-soundboard", "favorites.json");
+			if (File.Exists(favPath))
 			{
-				var isDefault = string.IsNullOrEmpty(s.GuildName) || s.GuildId == "0";
-				var guildPart = isDefault ? "[Discord] " : $"[{s.GuildName}] ";
+				var json = await File.ReadAllTextAsync(favPath, cancellationToken);
+				var list = System.Text.Json.JsonSerializer.Deserialize<List<string>>(json);
+				if (list != null) favorites = new HashSet<string>(list);
+			}
+		}
+		catch { }
+
+		var options = new List<ActionParameterOption>();
+
+		// 1. Pinned Favorites at the very top
+		if (favorites.Count > 0)
+		{
+			var favSounds = sounds
+				.Where(s => favorites.Contains(s.SoundId))
+				.OrderBy(s => s.Name, StringComparer.CurrentCultureIgnoreCase);
+
+			foreach (var s in favSounds)
+			{
 				var emojiPart = !string.IsNullOrEmpty(s.EmojiName) ? $"{s.EmojiName} " : "";
-				return new ActionParameterOption
+				options.Add(new ActionParameterOption
 				{
 					Value = s.SoundId,
-					Label = LocalizedText.FromLiteral($"{guildPart}{emojiPart}{s.Name}")
-				};
-			})
-			.ToList();
+					Label = LocalizedText.FromLiteral($"[⭐ Favori] {emojiPart}{s.Name}")
+				});
+			}
+		}
+
+		// 2. All sounds grouped by server and sorted
+		var serverSounds = sounds
+			.OrderBy(s => string.IsNullOrEmpty(s.GuildName) || s.GuildId == "0" ? " 0_Discord" : s.GuildName)
+			.ThenBy(s => s.Name, StringComparer.CurrentCultureIgnoreCase);
+
+		foreach (var s in serverSounds)
+		{
+			var isDefault = string.IsNullOrEmpty(s.GuildName) || s.GuildId == "0";
+			var guildPart = isDefault ? "[Discord] " : $"[{s.GuildName}] ";
+			var emojiPart = !string.IsNullOrEmpty(s.EmojiName) ? $"{s.EmojiName} " : "";
+			options.Add(new ActionParameterOption
+			{
+				Value = s.SoundId,
+				Label = LocalizedText.FromLiteral($"{guildPart}{emojiPart}{s.Name}")
+			});
+		}
 
 		if (options.Count == 0)
 		{

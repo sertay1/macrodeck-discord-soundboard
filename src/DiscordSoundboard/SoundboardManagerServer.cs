@@ -525,6 +525,65 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
             100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(35, 165, 90, 0); }
         }
 
+        /* Volume Slider Control */
+        .volume-control {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+        .btn-mute {
+            background: transparent;
+            border: none;
+            color: var(--muted);
+            cursor: pointer;
+            font-size: 14px;
+            padding: 0;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            transition: color 0.15s;
+            outline: none;
+        }
+        .btn-mute:hover { color: var(--text); }
+        .volume-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 75px;
+            height: 5px;
+            border-radius: 3px;
+            background: #2b2e35;
+            outline: none;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 13px;
+            height: 13px;
+            border-radius: 50%;
+            background: var(--accent);
+            cursor: pointer;
+            box-shadow: 0 0 6px var(--accent-glow);
+            transition: transform 0.15s;
+        }
+        .volume-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+        .volume-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            min-width: 28px;
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+        }
+
         /* Language Switcher Segmented Control */
         .lang-switch {
             display: inline-flex;
@@ -945,52 +1004,60 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
             <div class="header-actions">
                 <div class="status-badge">
                     <div class="status-dot pulsing" id="statusDot"></div>
-                    <span id="statusText">Bağlanıyor...</span>
+                    <span id="statusText">Connecting...</span>
+                </div>
+                <div class="volume-control" id="volControl" title="Preview Volume / Önizleme Sesi">
+                    <button type="button" class="btn-mute" id="btnMute" onclick="toggleMute()" title="Mute/Unmute">🔊</button>
+                    <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="75" oninput="onVolumeChange(this.value)">
+                    <span class="volume-label" id="volumeLabel">75%</span>
                 </div>
                 <div class="lang-switch" role="group" aria-label="Language">
-                    <button type="button" class="lang-btn active" id="btnLangTR" onclick="setLanguage('tr')">TR</button>
-                    <button type="button" class="lang-btn" id="btnLangEN" onclick="setLanguage('en')">EN</button>
+                    <button type="button" class="lang-btn" id="btnLangTR" onclick="setLanguage('tr')">TR</button>
+                    <button type="button" class="lang-btn active" id="btnLangEN" onclick="setLanguage('en')">EN</button>
                 </div>
                 <button type="button" class="btn-close" id="btnClose" onclick="closeWindow()">
-                    ✕ <span id="txtClose">Kapat</span>
+                    ✕ <span id="txtClose">Close</span>
                 </button>
             </div>
         </header>
 
         <div class="guide-banner">
             <div class="guide-left">
-                <span class="guide-tag" id="guideTag">💡 Hızlı Rehber</span>
+                <span class="guide-tag" id="guideTag">💡 Quick Guide</span>
                 <div class="guide-steps">
                     <div class="guide-step">
                         <span class="step-num">1</span>
-                        <span id="step1">Macro Deck'te Tuşa Tıkla</span>
+                        <span id="step1">Click Button in Macro Deck</span>
                     </div>
                     <span class="step-arrow">➔</span>
                     <div class="guide-step">
                         <span class="step-num">2</span>
-                        <span id="step2">Action Ekle</span>
+                        <span id="step2">Add Action</span>
                     </div>
                     <span class="step-arrow">➔</span>
                     <div class="guide-step">
                         <span class="step-num">3</span>
-                        <span id="step3">Play Discord Soundboard Sound Seç</span>
+                        <span id="step3">Pick Play Discord Soundboard Sound</span>
                     </div>
                 </div>
             </div>
-            <div class="guide-hint" id="guideHint">✨ Resmi Discord emojisiyle tuşunuza otomatik atanır!</div>
+            <div class="guide-hint" id="guideHint">✨ Automatically assigned with its official Discord emoji!</div>
         </div>
 
         <div class="filter-section">
             <div class="filter-chips">
                 <div class="filter-chip active" data-filter="all" onclick="setFilter('all')">
-                    <span id="txtFilterAll">🌟 Tümü</span> <span class="count-pill" id="countAll">0</span>
+                    <span id="txtFilterAll">🌟 All</span> <span class="count-pill" id="countAll">0</span>
                 </div>
                 <div class="filter-chip" data-filter="favs" onclick="setFilter('favs')">
-                    <span id="txtFilterFavs">⭐ Favorilerim</span> <span class="count-pill" id="countFavs">0</span>
+                    <span id="txtFilterFavs">⭐ Favorites</span> <span class="count-pill" id="countFavs">0</span>
                 </div>
                 <div class="filter-chip" data-filter="default" onclick="setFilter('default')">
-                    <span id="txtFilterDefault">🔊 Discord Varsayılan</span> <span class="count-pill" id="countDefault">0</span>
+                    <span id="txtFilterDefault">🔊 Discord Default</span> <span class="count-pill" id="countDefault">0</span>
                 </div>
+                <button type="button" class="filter-chip" id="btnRandom" onclick="playRandomPreview()" style="border-style: dashed; cursor: pointer;">
+                    <span id="txtBtnRandom">🎲 Surprise Me</span>
+                </button>
             </div>
             <div class="filter-right">
                 <select class="server-dropdown" id="serverSelect" onchange="onServerSelectChange(this.value)">
@@ -1055,7 +1122,9 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
                 toastConnError: "Could not connect to server.",
                 serverSoundCount: (name, count) => `${name} (${count} sounds)`,
                 defaultGuildName: "Discord (Default)",
-                serverFallback: (id) => `Server (${id})`
+                serverFallback: (id) => `Server (${id})`,
+                btnRandom: "🎲 Surprise Me",
+                toastRandomPlayed: (name) => `Playing random sound: "${name}" 🎲`
             },
             tr: {
                 title: "Discord Soundboard",
@@ -1095,11 +1164,14 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
                 toastConnError: "Sunucuya bağlanılamadı.",
                 serverSoundCount: (name, count) => `${name} (${count} ses)`,
                 defaultGuildName: "Discord (Varsayılan)",
-                serverFallback: (id) => `Sunucu (${id})`
+                serverFallback: (id) => `Sunucu (${id})`,
+                btnRandom: "🎲 Rastgele Çal",
+                toastRandomPlayed: (name) => `Rastgele çalınıyor: "${name}" 🎲`
             }
         };
 
-        let currentLang = localStorage.getItem('sfx_lang') || 'tr';
+        // Defaults to English unless user explicitly chose Turkish
+        let currentLang = localStorage.getItem('sfx_lang') || 'en';
         function t(key, ...args) {
             const entry = i18n[currentLang]?.[key];
             if (typeof entry === 'function') return entry(...args);
@@ -1454,7 +1526,7 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
 
                 const url = `https://cdn.discordapp.com/soundboard-sounds/${encodeURIComponent(s.sound_id)}`;
                 currentAudio = new Audio(url);
-                currentAudio.volume = 0.85;
+                currentAudio.volume = isMuted ? 0 : (previewVolume / 100);
                 playingSoundId = s.sound_id;
                 btn.textContent = t('previewStopBtn');
                 btn.classList.add('playing');
@@ -1491,6 +1563,81 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
             }
         }
 
+        // Preview Volume Control
+        let previewVolume = parseInt(localStorage.getItem('sfx_volume') || '75', 10);
+        let isMuted = false;
+        let prevUnmutedVolume = previewVolume > 0 ? previewVolume : 75;
+
+        function onVolumeChange(val) {
+            previewVolume = parseInt(val, 10);
+            localStorage.setItem('sfx_volume', previewVolume);
+            isMuted = previewVolume === 0;
+            updateVolumeUI();
+            if (currentAudio) {
+                currentAudio.volume = isMuted ? 0 : (previewVolume / 100);
+            }
+        }
+
+        function toggleMute() {
+            if (isMuted) {
+                previewVolume = prevUnmutedVolume > 0 ? prevUnmutedVolume : 75;
+                isMuted = false;
+            } else {
+                prevUnmutedVolume = previewVolume > 0 ? previewVolume : 75;
+                previewVolume = 0;
+                isMuted = true;
+            }
+            localStorage.setItem('sfx_volume', previewVolume);
+            updateVolumeUI();
+            if (currentAudio) {
+                currentAudio.volume = isMuted ? 0 : (previewVolume / 100);
+            }
+        }
+
+        function updateVolumeUI() {
+            const slider = document.getElementById('volumeSlider');
+            const label = document.getElementById('volumeLabel');
+            const muteBtn = document.getElementById('btnMute');
+            if (slider) slider.value = previewVolume;
+            if (label) label.textContent = `${previewVolume}%`;
+            if (muteBtn) {
+                if (previewVolume === 0) muteBtn.textContent = '🔇';
+                else if (previewVolume < 40) muteBtn.textContent = '🔉';
+                else muteBtn.textContent = '🔊';
+            }
+        }
+
+        // Surprise Me / Random Preview
+        function playRandomPreview() {
+            const pool = getFilteredSounds();
+            if (pool.length === 0) return;
+            const rand = pool[Math.floor(Math.random() * pool.length)];
+            const card = document.getElementById(`card-${rand.sound_id}`);
+            const btn = card ? card.querySelector('.btn-preview') : null;
+            if (card) {
+                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            togglePreviewAudio(rand, btn, card);
+            showToast(t('toastRandomPlayed', rand.name), '#5865F2');
+        }
+
+        // Keyboard Shortcuts
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                if (searchQuery) clearSearch();
+                else closeWindow();
+            } else if (e.key === '/' && document.activeElement !== searchInput) {
+                e.preventDefault();
+                searchInput.focus();
+            } else if (e.code === 'Space' && document.activeElement !== searchInput) {
+                e.preventDefault();
+                if (currentAudio) {
+                    if (currentAudio.paused) currentAudio.play();
+                    else currentAudio.pause();
+                }
+            }
+        });
+
         async function closeWindow() {
             try {
                 await apiFetch('/api/close', { method: 'POST' });
@@ -1518,8 +1665,10 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
             document.getElementById('txtFilterAll').textContent = t('allFilter');
             document.getElementById('txtFilterFavs').textContent = t('favsFilter');
             document.getElementById('txtFilterDefault').textContent = t('defaultFilter');
+            document.getElementById('txtBtnRandom').textContent = t('btnRandom');
             document.getElementById('searchInput').placeholder = t('searchPlaceholder');
 
+            updateVolumeUI();
             updateStatusBadge();
             populateServerDropdown();
             renderGrid();
