@@ -686,7 +686,7 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
 			{
 				triggerId = "onShortPress",
 				triggerType = "onShortPress",
-				triggerLabel = "Kısa basma",
+				triggerLabel = "Short press",
 				children = new[]
 				{
 					new
@@ -780,7 +780,7 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
 			{
 				triggerId = "onShortPress",
 				triggerType = "onShortPress",
-				triggerLabel = "Kısa basma",
+				triggerLabel = "Short press",
 				children = new[]
 				{
 					new
@@ -788,7 +788,7 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
 						id = actionChildId,
 						type = "action",
 						blockType = "app.macro-deck.deck.go-to-parent",
-						label = "Üst klasöre git",
+						label = "Go to parent",
 						color = "#3b82f6",
 						integrationId = "app.macro-deck.deck",
 						actionId = "go-to-parent",
@@ -867,7 +867,7 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
 	{
 		const string html = """
 		<!DOCTYPE html>
-		<html lang="tr">
+		<html lang="en">
 		<head>
 		    <meta charset="UTF-8">
 		    <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -929,6 +929,7 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
 		            align-items: center;
 		            gap: 6px;
 		            transition: all 0.15s;
+		            outline: none;
 		        }
 		        .btn-header:hover { background: var(--card-hover); border-color: var(--accent); }
 		        
@@ -1203,75 +1204,214 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
 		            <div class="title-area">
 		                <h1>
 		                    <svg width="24" height="24" viewBox="0 0 24 24" fill="#5865F2"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.929 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.893.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
-		                    Discord Soundboard Manager
+		                    <span id="txtHeaderTitle">Discord Soundboard Manager</span>
 		                </h1>
-		                <p>Sunuculara göre filtreleyin, favorilerinizi seçin ve doğrudan Macro Deck butonlarına aktarın.</p>
+		                <p id="txtHeaderSubtitle">Filter by server, pick your favorites, and export directly as Macro Deck buttons.</p>
 		            </div>
 		            <div class="header-actions">
+		                <select class="btn-header" id="langSelect" onchange="changeLanguage(this.value)" style="cursor:pointer; font-weight:600; padding:6px 10px;">
+		                    <option value="en">🌐 English</option>
+		                    <option value="tr">🌐 Türkçe</option>
+		                </select>
 		                <div class="status-badge" id="statusBadge">
 		                    <div class="status-dot"></div>
-		                    <span id="statusText">Bağlanıyor...</span>
+		                    <span id="statusText">Connecting...</span>
 		                </div>
-		                <button class="btn-header" onclick="restartMacroDeck()" title="Macro Deck'i Yeniden Başlat">🔄 Yeniden Başlat</button>
-		                <button class="btn-header" onclick="window.close()" title="Pencereyi Kapat">✕ Kapat</button>
+		                <button class="btn-header" id="btnRestart" onclick="restartMacroDeck()" title="Restart Macro Deck">🔄 Restart</button>
+		                <button class="btn-header" id="btnClose" onclick="window.close()" title="Close Window">✕ Close</button>
 		            </div>
 		        </header>
 
 		        <!-- Server & Category Filter Bar -->
 		        <div class="filter-section">
 		            <div class="filter-chips" id="filterChips">
-		                <div class="filter-chip active" data-filter="all">🌟 Tümü <span class="count-pill" id="countAll">0</span></div>
-		                <div class="filter-chip" data-filter="favorites">⭐ Favorilerim <span class="count-pill" id="countFavs">0</span></div>
-		                <div class="filter-chip" data-filter="0">🔊 Discord Varsayılan <span class="count-pill" id="countDefault">0</span></div>
+		                <div class="filter-chip active" data-filter="all"><span id="txtFilterAll">🌟 All</span> <span class="count-pill" id="countAll">0</span></div>
+		                <div class="filter-chip" data-filter="favorites"><span id="txtFilterFavs">⭐ Favorites</span> <span class="count-pill" id="countFavs">0</span></div>
+		                <div class="filter-chip" data-filter="0"><span id="txtFilterDefault">🔊 Discord Default</span> <span class="count-pill" id="countDefault">0</span></div>
 		            </div>
 		            <select class="server-dropdown" id="serverSelect">
-		                <option value="">🏰 Sunucuya Göre Filtrele...</option>
+		                <option value="">🏰 Filter by Server...</option>
 		            </select>
 		        </div>
 
 		        <div class="toolbar">
-		            <input type="text" class="search-box" id="searchInput" placeholder="🔍 Ses veya sunucu adına göre ara...">
+		            <input type="text" class="search-box" id="searchInput" placeholder="🔍 Search by sound or server name...">
 		            <div style="display: flex; align-items: center; gap: 8px;">
-		                <label for="targetFolderSelect" style="font-size: 13px; color: var(--muted); white-space: nowrap;">📁 Hedef Klasör:</label>
+		                <label for="targetFolderSelect" id="lblTargetFolder" style="font-size: 13px; color: var(--muted); white-space: nowrap;">📁 Target Folder:</label>
 		                <select class="server-dropdown" id="targetFolderSelect" style="min-width: 180px;">
-		                    <option value="">Yükleniyor...</option>
+		                    <option value="">Loading...</option>
 		                </select>
 		            </div>
-		            <button class="btn btn-secondary" id="btnSelectAll">Görünenleri Seç / Temizle</button>
+		            <button class="btn btn-secondary" id="btnSelectAll">Select / Clear Visible</button>
 		            <button class="btn btn-primary" id="btnSync" disabled>
-		                🚀 Seçilenleri Macro Deck'e Aktar (<span id="selCount">0</span>)
+		                🚀 Export Selected to Macro Deck (<span id="selCount">0</span>)
 		            </button>
 		        </div>
 
 		        <div class="sound-grid" id="soundGrid">
-		            <div style="color: var(--muted); grid-column: 1 / -1; text-align: center; padding: 40px;">
-		                Sesler yükleniyor...
+		            <div style="color: var(--muted); grid-column: 1 / -1; text-align: center; padding: 40px;" id="txtGridLoading">
+		                Sounds loading...
 		            </div>
 		        </div>
 		    </div>
 
-		    <div class="toast" id="toast">Bildirim</div>
+		    <div class="toast" id="toast">Notification</div>
 
 		    <!-- Success Modal -->
 		    <div class="modal-overlay" id="successModal">
 		        <div class="modal">
-		            <h2>🎉 Sesler Aktarıldı!</h2>
-		            <p id="modalMessage">Seçtiğiniz sesler Macro Deck'e aktarıldı ve buton ikonları oluşturuldu.</p>
+		            <h2 id="modalTitle">🎉 Sounds Exported!</h2>
+		            <p id="modalMessage">Your selected sounds have been added as buttons to Macro Deck.</p>
 		            <div class="modal-buttons">
-		                <button class="btn btn-primary" onclick="restartMacroDeckNow()">
-		                    🔄 Macro Deck'i Yeniden Başlat (Hemen Görünsün)
+		                <button class="btn btn-primary" id="modalBtnRestart" onclick="restartMacroDeckNow()">
+		                    🔄 Restart Macro Deck (Apply Now)
 		                </button>
-		                <button class="btn btn-secondary" onclick="closeModal()">
-		                    Tamam (Daha Sonra Başlat)
+		                <button class="btn btn-secondary" id="modalBtnLater" onclick="closeModal()">
+		                    Done (Restart Later)
 		                </button>
 		            </div>
 		        </div>
 		    </div>
 
 		    <script>
+		        const i18n = {
+		            en: {
+		                title: "Discord Soundboard Manager",
+		                subtitle: "Filter by server, pick your favorites, and export directly as Macro Deck buttons.",
+		                connecting: "Connecting...",
+		                waitingConnection: "Waiting for Connection",
+		                connectionError: "Server Connection Error",
+		                soundsLoaded: (user, count) => `${user || 'Discord'} (${count} sounds)`,
+		                restartBtn: "🔄 Restart",
+		                restartTitle: "Restart Macro Deck",
+		                closeBtn: "✕ Close",
+		                closeTitle: "Close Window",
+		                allFilter: "🌟 All",
+		                favsFilter: "⭐ Favorites",
+		                defaultFilter: "🔊 Discord Default",
+		                serverPlaceholder: "🏰 Filter by Server...",
+		                searchPlaceholder: "🔍 Search by sound or server name...",
+		                targetFolderLabel: "📁 Target Folder:",
+		                loading: "Loading...",
+		                defaultFolder: "(Default Folder)",
+		                currentFolderSuffix: " (Current Folder)",
+		                selectAllBtn: "Select / Clear Visible",
+		                syncBtn: (count) => `🚀 Export Selected to Macro Deck (<span id="selCount">${count}</span>)`,
+		                syncingBtn: "Exporting...",
+		                emptySounds: "No matching sounds found.",
+		                loadingSounds: "Sounds loading...",
+		                soundsFetchError: "Could not retrieve sounds. Make sure Discord desktop app is running.",
+		                playBtn: "▶ Play",
+		                playTooltip: "Preview Play",
+		                addFavTooltip: "Add to Favorites",
+		                removeFavTooltip: "Remove from Favorites",
+		                toastPlayed: (name) => `"${name}" played successfully! 🔊`,
+		                toastPlayError: "Could not play sound (are you connected to a voice channel?)",
+		                toastPlayReqError: "Failed to send play request.",
+		                toastNoSelection: "Please select sounds to export first!",
+		                toastSyncError: "Error occurred during export.",
+		                toastConnError: "Could not connect to server.",
+		                toastRestarting: "Macro Deck restarting in 1-2 seconds...",
+		                restartConfirm: "Restart Macro Deck now?",
+		                modalTitle: "🎉 Sounds Exported!",
+		                modalMsg: (count, folder) => `<strong>${count} sounds</strong> successfully added as buttons to Macro Deck folder "<strong>${folder}</strong>" with generated icons.<br><br>Restart Macro Deck now to display your new buttons immediately:`,
+		                modalRestartBtn: "🔄 Restart Macro Deck (Apply Now)",
+		                modalLaterBtn: "Done (Restart Later)",
+		                serverSoundCount: (name, count) => `${name} (${count} sounds)`,
+		                defaultGuildName: "Discord (Default)",
+		                serverFallback: (id) => `Server (${id})`
+		            },
+		            tr: {
+		                title: "Discord Soundboard Manager",
+		                subtitle: "Sunuculara göre filtreleyin, favorilerinizi seçin ve doğrudan Macro Deck butonlarına aktarın.",
+		                connecting: "Bağlanıyor...",
+		                waitingConnection: "Bağlantı Bekleniyor",
+		                connectionError: "Sunucu Bağlantı Hatası",
+		                soundsLoaded: (user, count) => `${user || 'Discord'} (${count} ses)`,
+		                restartBtn: "🔄 Yeniden Başlat",
+		                restartTitle: "Macro Deck'i Yeniden Başlat",
+		                closeBtn: "✕ Kapat",
+		                closeTitle: "Pencereyi Kapat",
+		                allFilter: "🌟 Tümü",
+		                favsFilter: "⭐ Favorilerim",
+		                defaultFilter: "🔊 Discord Varsayılan",
+		                serverPlaceholder: "🏰 Belirli Bir Sunucu Seç...",
+		                searchPlaceholder: "🔍 Ses veya sunucu adına göre ara...",
+		                targetFolderLabel: "📁 Hedef Klasör:",
+		                loading: "Yükleniyor...",
+		                defaultFolder: "(Varsayılan Klasör)",
+		                currentFolderSuffix: " (Bu Klasör)",
+		                selectAllBtn: "Görünenleri Seç / Temizle",
+		                syncBtn: (count) => `🚀 Seçilenleri Macro Deck'e Aktar (<span id="selCount">${count}</span>)`,
+		                syncingBtn: "Aktarılıyor...",
+		                emptySounds: "Eşleşen ses bulunamadı.",
+		                loadingSounds: "Sesler yükleniyor...",
+		                soundsFetchError: "Sesler alınamadı. Discord uygulamasının açık olduğundan emin olun.",
+		                playBtn: "▶ Çal",
+		                playTooltip: "Önizleme Çal",
+		                addFavTooltip: "Favorilere Ekle",
+		                removeFavTooltip: "Favorilerden Çıkar",
+		                toastPlayed: (name) => `"${name}" başarıyla çalındı! 🔊`,
+		                toastPlayError: "Ses çalınamadı (Discord'da ses kanalında mısınız?)",
+		                toastPlayReqError: "Çalma isteği iletilemedi.",
+		                toastNoSelection: "Lütfen önce aktarmak istediğiniz sesleri seçin!",
+		                toastSyncError: "Aktarım sırasında hata oluştu.",
+		                toastConnError: "Sunucuya bağlanılamadı.",
+		                toastRestarting: "Macro Deck 1-2 saniye içinde yeniden başlatılıyor...",
+		                restartConfirm: "Macro Deck şimdi yeniden başlatılsın mı?",
+		                modalTitle: "🎉 Sesler Aktarıldı!",
+		                modalMsg: (count, folder) => `<strong>${count} ses</strong> başarıyla Macro Deck "<strong>${folder}</strong>" klasörüne buton olarak eklendi ve tüm buton simgeleri hazırlandı.<br><br>Macro Deck'in butonları ve simgeleri hemen ekranda göstermesi için yeniden başlatabilirsiniz:`,
+		                modalRestartBtn: "🔄 Macro Deck'i Yeniden Başlat (Hemen Görünsün)",
+		                modalLaterBtn: "Tamam (Daha Sonra Başlat)",
+		                serverSoundCount: (name, count) => `${name} (${count} ses)`,
+		                defaultGuildName: "Discord (Varsayılan)",
+		                serverFallback: (id) => `Sunucu (${id})`
+		            }
+		        };
+
+		        let currentLang = localStorage.getItem('soundboard_lang') || 'en';
+
+		        function t(key, ...args) {
+		            const langObj = i18n[currentLang] || i18n['en'];
+		            const val = langObj[key] !== undefined ? langObj[key] : (i18n['en'][key] || key);
+		            if (typeof val === 'function') return val(...args);
+		            return val;
+		        }
+
+		        function changeLanguage(lang) {
+		            currentLang = lang;
+		            localStorage.setItem('soundboard_lang', lang);
+		            applyLanguage();
+		        }
+
+		        function applyLanguage() {
+		            document.getElementById('langSelect').value = currentLang;
+		            document.getElementById('txtHeaderSubtitle').textContent = t('subtitle');
+		            document.getElementById('btnRestart').textContent = t('restartBtn');
+		            document.getElementById('btnRestart').title = t('restartTitle');
+		            document.getElementById('btnClose').textContent = t('closeBtn');
+		            document.getElementById('btnClose').title = t('closeTitle');
+		            document.getElementById('txtFilterAll').textContent = t('allFilter');
+		            document.getElementById('txtFilterFavs').textContent = t('favsFilter');
+		            document.getElementById('txtFilterDefault').textContent = t('defaultFilter');
+		            document.getElementById('searchInput').placeholder = t('searchPlaceholder');
+		            document.getElementById('lblTargetFolder').textContent = t('targetFolderLabel');
+		            document.getElementById('btnSelectAll').textContent = t('selectAllBtn');
+		            btnSync.innerHTML = t('syncBtn', selected.size);
+		            document.getElementById('modalTitle').textContent = t('modalTitle');
+		            document.getElementById('modalBtnRestart').textContent = t('modalRestartBtn');
+		            document.getElementById('modalBtnLater').textContent = t('modalLaterBtn');
+
+		            if (cachedFolders) populateFolderDropdown(cachedFolders);
+		            populateServerDropdown();
+		            renderGrid();
+		        }
+
 		        let allSounds = [];
 		        let favorites = new Set();
 		        let activeFilter = 'all';
+		        let cachedFolders = null;
+		        let lastStatus = null;
 		        const selected = new Set();
 
 		        const grid = document.getElementById('soundGrid');
@@ -1302,17 +1442,17 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
 		        }
 
 		        async function restartMacroDeckNow() {
-		            showToast('Macro Deck 1-2 saniye içinde yeniden başlatılıyor...', '#5865F2');
+		            showToast(t('toastRestarting'), '#5865F2');
 		            try {
 		                await fetch('/api/restart-macrodeck', { method: 'POST' });
 		                setTimeout(() => window.close(), 1800);
 		            } catch (e) {
-		                showToast('Yeniden başlatma komutu iletilemedi.');
+		                showToast(t('toastPlayReqError'));
 		            }
 		        }
 
 		        async function restartMacroDeck() {
-		            if (confirm("Macro Deck şimdi yeniden başlatılsın mı?")) {
+		            if (confirm(t('restartConfirm'))) {
 		                await restartMacroDeckNow();
 		            }
 		        }
@@ -1320,12 +1460,8 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
 		        async function loadSoundsAndFavorites() {
 		            try {
 		                const stRes = await fetch('/api/status');
-		                const st = await stRes.json();
-		                if (st.connected && st.authenticated) {
-		                    statusText.textContent = `${st.username || 'Discord'} (${st.soundCount} ses)`;
-		                } else {
-		                    statusText.textContent = 'Bağlantı Bekleniyor';
-		                }
+		                lastStatus = await stRes.json();
+		                updateStatusBadge();
 
 		                const [soundsRes, favsRes, foldersRes] = await Promise.all([
 		                    fetch('/api/sounds'),
@@ -1337,22 +1473,31 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
 		                const favList = await favsRes.json();
 		                favorites = new Set(favList);
 
-		                const folderList = await foldersRes.json();
-		                populateFolderDropdown(folderList);
+		                cachedFolders = await foldersRes.json();
+		                populateFolderDropdown(cachedFolders);
 
 		                populateServerDropdown();
 		                updateCounts();
 		                renderGrid();
 		            } catch (e) {
-		                statusText.textContent = 'Sunucu Bağlantı Hatası';
-		                grid.innerHTML = '<div style="color:var(--danger); grid-column:1/-1; text-align:center;">Sesler alınamadı. Discord uygulamasının açık olduğundan emin olun.</div>';
+		                statusText.textContent = t('connectionError');
+		                grid.innerHTML = `<div style="color:var(--danger); grid-column:1/-1; text-align:center;">${t('soundsFetchError')}</div>`;
+		            }
+		        }
+
+		        function updateStatusBadge() {
+		            if (!lastStatus) return;
+		            if (lastStatus.connected && lastStatus.authenticated) {
+		                statusText.textContent = t('soundsLoaded', lastStatus.username, lastStatus.soundCount);
+		            } else {
+		                statusText.textContent = t('waitingConnection');
 		            }
 		        }
 
 		        function populateFolderDropdown(folders) {
 		            targetFolderSelect.innerHTML = '';
 		            if (!folders || folders.length === 0) {
-		                targetFolderSelect.innerHTML = '<option value="">(Varsayılan Klasör)</option>';
+		                targetFolderSelect.innerHTML = `<option value="">${t('defaultFolder')}</option>`;
 		                return;
 		            }
 		            let hasCaller = false;
@@ -1360,7 +1505,7 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
 		                const opt = document.createElement('option');
 		                opt.value = f.id;
 		                if (f.isCaller) {
-		                    opt.textContent = `⭐ ${f.name} (Bu Klasör)`;
+		                    opt.textContent = `⭐ ${f.name}${t('currentFolderSuffix')}`;
 		                    opt.selected = true;
 		                    hasCaller = true;
 		                } else {
@@ -1386,19 +1531,21 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
 		            const guildMap = new Map();
 		            allSounds.forEach(s => {
 		                if (s.guild_id && s.guild_id !== '0') {
-		                    const name = s.guild_name || `Sunucu (${s.guild_id})`;
+		                    const name = s.guild_name || t('serverFallback', s.guild_id);
 		                    guildMap.set(s.guild_id, (guildMap.get(s.guild_id) || { name, count: 0 }));
 		                    guildMap.get(s.guild_id).count++;
 		                }
 		            });
 
-		            serverSelect.innerHTML = '<option value="">🏰 Belirli Bir Sunucu Seç...</option>';
+		            const currentVal = serverSelect.value;
+		            serverSelect.innerHTML = `<option value="">${t('serverPlaceholder')}</option>`;
 		            Array.from(guildMap.entries())
-		                .sort((a, b) => a[1].name.localeCompare(b[1].name, 'tr'))
+		                .sort((a, b) => a[1].name.localeCompare(b[1].name, currentLang))
 		                .forEach(([gid, info]) => {
 		                    const opt = document.createElement('option');
 		                    opt.value = gid;
-		                    opt.textContent = `${info.name} (${info.count} ses)`;
+		                    opt.textContent = t('serverSoundCount', info.name, info.count);
+		                    if (gid === currentVal) opt.selected = true;
 		                    serverSelect.appendChild(opt);
 		                });
 		        }
@@ -1427,7 +1574,6 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
 		        function getFilteredSounds() {
 		            const query = searchInput.value.toLowerCase().trim();
 		            return allSounds.filter(s => {
-		                // Server / Category Filter
 		                if (activeFilter === 'favorites') {
 		                    if (!favorites.has(s.sound_id)) return false;
 		                } else if (activeFilter === '0') {
@@ -1436,7 +1582,6 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
 		                    if (s.guild_id !== activeFilter) return false;
 		                }
 
-		                // Search text Filter
 		                if (query) {
 		                    const nameMatch = s.name.toLowerCase().includes(query);
 		                    const guildMatch = (s.guild_name || '').toLowerCase().includes(query);
@@ -1447,11 +1592,18 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
 		            });
 		        }
 
+		        function getResolvedGuildName(s) {
+		            if (s.guild_id === '0' || !s.guild_id || s.guild_name === 'Discord (Default)' || s.guild_name === 'Discord (Varsayılan)') {
+		                return t('defaultGuildName');
+		            }
+		            return s.guild_name || t('serverFallback', s.guild_id);
+		        }
+
 		        function renderGrid() {
 		            const filtered = getFilteredSounds();
 		            grid.innerHTML = '';
 		            if (filtered.length === 0) {
-		                grid.innerHTML = '<div style="color: var(--muted); grid-column: 1 / -1; text-align: center; padding: 40px;">Eşleşen ses bulunamadı.</div>';
+		                grid.innerHTML = `<div style="color: var(--muted); grid-column: 1 / -1; text-align: center; padding: 40px;">${t('emptySounds')}</div>`;
 		                return;
 		            }
 
@@ -1467,18 +1619,19 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
 		                }
 
 		                const isFav = favorites.has(s.sound_id);
+		                const displayGuild = getResolvedGuildName(s);
 
 		                card.innerHTML = `
 		                    <div class="card-top">
 		                        <div class="sound-icon">${iconHtml}</div>
 		                        <div class="sound-info">
 		                            <div class="sound-name" title="${s.name}">${s.name}</div>
-		                            <div class="sound-guild" title="${s.guild_name || 'Discord'}">${s.guild_name || 'Discord'}</div>
+		                            <div class="sound-guild" title="${displayGuild}">${displayGuild}</div>
 		                        </div>
-		                        <button class="btn-fav ${isFav ? 'favorited' : ''}" title="${isFav ? 'Favorilerden Çıkar' : 'Favorilere Ekle'}">${isFav ? '★' : '☆'}</button>
+		                        <button class="btn-fav ${isFav ? 'favorited' : ''}" title="${isFav ? t('removeFavTooltip') : t('addFavTooltip')}">${isFav ? '★' : '☆'}</button>
 		                    </div>
 		                    <div class="card-bottom">
-		                        <button class="btn-play" title="Önizleme Çal">▶ Çal</button>
+		                        <button class="btn-play" title="${t('playTooltip')}">${t('playBtn')}</button>
 		                        <div class="checkbox-custom"></div>
 		                    </div>
 		                `;
@@ -1522,12 +1675,12 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
 		                        const res = await fetch(`/api/play?id=${encodeURIComponent(s.sound_id)}&guild_id=${encodeURIComponent(s.guild_id || '')}`);
 		                        const json = await res.json();
 		                        if (json.success) {
-		                            showToast(`"${s.name}" başarıyla çalındı! 🔊`);
+		                            showToast(t('toastPlayed', s.name));
 		                        } else {
-		                            showToast(`Ses çalınamadı (Discord'da ses kanalında mısınız?)`, '#da373c');
+		                            showToast(t('toastPlayError'), '#da373c');
 		                        }
 		                    } catch (err) {
-		                        showToast('Çalma isteği iletilemedi.', '#da373c');
+		                        showToast(t('toastPlayReqError'), '#da373c');
 		                    }
 		                });
 
@@ -1560,11 +1713,11 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
 
 		        btnSync.addEventListener('click', async () => {
 		            if (selected.size === 0) {
-		                showToast('Lütfen önce aktarmak istediğiniz sesleri seçin!');
+		                showToast(t('toastNoSelection'));
 		                return;
 		            }
 		            btnSync.disabled = true;
-		            btnSync.textContent = 'Aktarılıyor...';
+		            btnSync.textContent = t('syncingBtn');
 		            try {
 		                const folderId = targetFolderSelect.value;
 		                const res = await fetch('/api/sync', {
@@ -1577,16 +1730,16 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
 		                });
 		                const data = await res.json();
 		                if (data.success) {
-		                    modalMessage.innerHTML = `<strong>${data.count} ses</strong> başarıyla Macro Deck "<strong>${data.folderName}</strong>" klasörüne buton olarak eklendi ve tüm buton simgeleri hazırlandı.<br><br>Macro Deck'in butonları ve simgeleri hemen ekranda göstermesi için yeniden başlatabilirsiniz:`;
+		                    modalMessage.innerHTML = t('modalMsg', data.count, data.folderName);
 		                    successModal.classList.add('active');
 		                } else {
-		                    showToast('Aktarım sırasında hata oluştu.', '#da373c');
+		                    showToast(t('toastSyncError'), '#da373c');
 		                }
 		            } catch (e) {
-		                showToast('Sunucuya bağlanılamadı.', '#da373c');
+		                showToast(t('toastConnError'), '#da373c');
 		            } finally {
 		                btnSync.disabled = false;
-		                btnSync.innerHTML = `🚀 Seçilenleri Macro Deck'e Aktar (<span id="selCount">${selected.size}</span>)`;
+		                btnSync.innerHTML = t('syncBtn', selected.size);
 		            }
 		        });
 
@@ -1596,6 +1749,7 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
 		            } catch (e) { }
 		        });
 
+		        applyLanguage();
 		        loadSoundsAndFavorites();
 		    </script>
 		</body>

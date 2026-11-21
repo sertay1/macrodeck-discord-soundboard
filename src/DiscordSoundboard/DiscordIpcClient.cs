@@ -117,7 +117,7 @@ public sealed class DiscordIpcClient : IAsyncDisposable
 	{
 		if (s.GuildId == "0" || string.IsNullOrEmpty(s.GuildId))
 		{
-			s.GuildName = "Discord (Varsayılan)";
+			s.GuildName = "Discord (Default)";
 		}
 		else if (_guilds.TryGetValue(s.GuildId, out var gname))
 		{
@@ -125,7 +125,7 @@ public sealed class DiscordIpcClient : IAsyncDisposable
 		}
 		else if (string.IsNullOrEmpty(s.GuildName))
 		{
-			s.GuildName = $"Sunucu ({s.GuildId})";
+			s.GuildName = $"Server ({s.GuildId})";
 		}
 	}
 
