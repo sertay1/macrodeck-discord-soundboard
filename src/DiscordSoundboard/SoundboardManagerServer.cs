@@ -425,180 +425,366 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
     <title>Discord Soundboard - Macro Deck</title>
     <style>
         :root {
-            --bg: #121315;
-            --card-bg: #1e1f22;
-            --card-hover: #2b2d31;
+            --bg: #0e1013;
+            --surface: #15171b;
+            --card-bg: #1a1c21;
+            --card-hover: #22252b;
             --accent: #5865F2;
             --accent-hover: #4752c4;
+            --accent-glow: rgba(88, 101, 242, 0.25);
             --text: #f2f3f5;
-            --muted: #949ba4;
-            --border: #313338;
+            --text-secondary: #c4c9d0;
+            --muted: #8b929b;
+            --border: #282b30;
+            --border-subtle: rgba(255, 255, 255, 0.07);
             --success: #23a55a;
+            --success-glow: rgba(35, 165, 90, 0.25);
             --gold: #f0b232;
+            --gold-glow: rgba(240, 178, 50, 0.25);
             --danger: #da373c;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
             background-color: var(--bg);
             color: var(--text);
-            padding: 20px;
+            padding: 20px 24px 30px;
             user-select: none;
+            overflow-y: scroll;
         }
-        .container { max-width: 1240px; margin: 0 auto; }
+        .container { max-width: 1300px; margin: 0 auto; }
+
+        /* Header */
         header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 16px;
-            padding-bottom: 14px;
+            margin-bottom: 18px;
+            padding-bottom: 16px;
             border-bottom: 1px solid var(--border);
         }
-        .title-area h1 { font-size: 22px; display: flex; align-items: center; gap: 10px; }
-        .title-area p { color: var(--muted); font-size: 13px; margin-top: 3px; }
-        .header-actions { display: flex; align-items: center; gap: 10px; }
-        .status-badge {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            padding: 7px 12px;
-            border-radius: 20px;
-            font-size: 12px;
+        .title-area {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .logo-box {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #5865F2, #3c45a5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 14px var(--accent-glow);
+        }
+        .title-content h1 {
+            font-size: 21px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            color: #ffffff;
             display: flex;
             align-items: center;
             gap: 8px;
         }
-        .status-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--success); }
-        .btn-header {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            color: var(--text);
-            padding: 7px 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 12px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            transition: all 0.15s;
-            outline: none;
+        .title-content p {
+            color: var(--muted);
+            font-size: 13px;
+            margin-top: 3px;
         }
-        .btn-header:hover { background: var(--card-hover); border-color: var(--accent); }
-
-        /* Guide Banner */
-        .guide-banner {
-            background: linear-gradient(135deg, rgba(88, 101, 242, 0.15), rgba(35, 165, 90, 0.1));
-            border: 1px solid rgba(88, 101, 242, 0.35);
-            border-radius: 10px;
-            padding: 12px 16px;
-            margin-bottom: 16px;
+        .header-actions {
             display: flex;
             align-items: center;
             gap: 12px;
-            font-size: 13px;
-            line-height: 1.45;
         }
-        .guide-banner .guide-icon { font-size: 24px; flex-shrink: 0; }
-        .guide-banner .guide-text strong { color: #fff; }
-        
-        /* Filter Bar */
+        .status-badge {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .status-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: var(--success);
+            box-shadow: 0 0 8px var(--success);
+        }
+        .status-dot.pulsing {
+            animation: pulse-dot 2s infinite;
+        }
+        @keyframes pulse-dot {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(35, 165, 90, 0.7); }
+            70% { transform: scale(1.1); box-shadow: 0 0 0 6px rgba(35, 165, 90, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(35, 165, 90, 0); }
+        }
+
+        /* Language Switcher Segmented Control */
+        .lang-switch {
+            display: inline-flex;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2px;
+            gap: 2px;
+        }
+        .lang-btn {
+            background: transparent;
+            border: none;
+            color: var(--muted);
+            padding: 5px 12px;
+            border-radius: 16px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            outline: none;
+        }
+        .lang-btn:hover { color: var(--text); }
+        .lang-btn.active {
+            background: var(--accent);
+            color: #ffffff;
+            box-shadow: 0 2px 8px var(--accent-glow);
+        }
+
+        .btn-close {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--muted);
+            padding: 7px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.18s;
+            outline: none;
+        }
+        .btn-close:hover {
+            background: rgba(218, 55, 60, 0.15);
+            border-color: var(--danger);
+            color: #ff6b6b;
+        }
+
+        /* Guide Banner - 3 Step Visual Flow */
+        .guide-banner {
+            background: linear-gradient(135deg, rgba(88, 101, 242, 0.12) 0%, rgba(35, 165, 90, 0.08) 100%);
+            border: 1px solid rgba(88, 101, 242, 0.3);
+            border-radius: 12px;
+            padding: 12px 18px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .guide-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .guide-tag {
+            background: var(--accent);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+        .guide-steps {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            flex-wrap: wrap;
+        }
+        .guide-step {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(0, 0, 0, 0.25);
+            padding: 4px 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border-subtle);
+        }
+        .guide-step .step-num {
+            background: rgba(88, 101, 242, 0.4);
+            color: #fff;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 700;
+        }
+        .step-arrow { color: var(--muted); font-size: 11px; }
+        .guide-hint {
+            font-size: 12px;
+            color: var(--muted);
+            white-space: nowrap;
+        }
+
+        /* Filter Section */
         .filter-section {
             display: flex;
-            gap: 10px;
-            margin-bottom: 16px;
+            justify-content: space-between;
             align-items: center;
+            gap: 14px;
+            margin-bottom: 16px;
             flex-wrap: wrap;
         }
         .filter-chips {
             display: flex;
             gap: 8px;
-            overflow-x: auto;
-            padding-bottom: 4px;
-            scrollbar-width: thin;
+            flex-wrap: wrap;
         }
         .filter-chip {
             background: var(--card-bg);
             border: 1px solid var(--border);
             color: var(--muted);
-            padding: 7px 14px;
-            border-radius: 18px;
+            padding: 7px 15px;
+            border-radius: 20px;
             font-size: 13px;
-            font-weight: 500;
+            font-weight: 600;
             cursor: pointer;
-            white-space: nowrap;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            transition: all 0.18s;
+            gap: 8px;
+            transition: all 0.18s ease;
         }
         .filter-chip:hover {
             background: var(--card-hover);
             color: var(--text);
-            border-color: #4e5058;
+            border-color: #3f4248;
         }
         .filter-chip.active {
             background: var(--accent);
-            color: white;
+            color: #ffffff;
             border-color: var(--accent);
+            box-shadow: 0 2px 10px var(--accent-glow);
         }
-        .filter-chip .count-pill {
-            background: rgba(0,0,0,0.25);
-            padding: 2px 7px;
-            border-radius: 10px;
+        .count-pill {
+            background: rgba(0, 0, 0, 0.35);
+            padding: 2px 8px;
+            border-radius: 12px;
             font-size: 11px;
+            font-weight: 700;
+        }
+        .filter-chip.active .count-pill {
+            background: rgba(255, 255, 255, 0.25);
+            color: #fff;
+        }
+
+        .filter-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+            justify-content: flex-end;
+            min-width: 320px;
         }
         .server-dropdown {
             background: var(--card-bg);
             border: 1px solid var(--border);
             color: var(--text);
-            padding: 8px 12px;
-            border-radius: 8px;
+            padding: 9px 14px;
+            border-radius: 10px;
             font-size: 13px;
             outline: none;
             cursor: pointer;
-            min-width: 220px;
+            transition: border-color 0.2s;
+            max-width: 260px;
+            width: 100%;
         }
         .server-dropdown:focus { border-color: var(--accent); }
 
-        .toolbar {
+        .search-wrapper {
+            position: relative;
+            flex: 1;
+            max-width: 320px;
             display: flex;
-            gap: 12px;
-            margin-bottom: 18px;
             align-items: center;
         }
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            font-size: 13px;
+            color: var(--muted);
+            pointer-events: none;
+        }
         .search-box {
-            flex: 1;
+            width: 100%;
             background: var(--card-bg);
             border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 9px 14px;
+            border-radius: 10px;
+            padding: 9px 34px 9px 34px;
             color: var(--text);
-            font-size: 14px;
+            font-size: 13px;
             outline: none;
-            transition: border-color 0.2s;
+            transition: all 0.2s;
         }
-        .search-box:focus { border-color: var(--accent); }
+        .search-box:focus {
+            border-color: var(--accent);
+            background: var(--card-hover);
+        }
+        .search-clear {
+            position: absolute;
+            right: 10px;
+            background: transparent;
+            border: none;
+            color: var(--muted);
+            font-size: 14px;
+            cursor: pointer;
+            display: none;
+            padding: 2px 6px;
+        }
+        .search-clear:hover { color: var(--text); }
 
+        /* Sound Grid */
         .sound-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
             gap: 14px;
         }
         .sound-card {
             background: var(--card-bg);
             border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 12px;
+            border-radius: 12px;
+            padding: 13px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            transition: all 0.18s ease;
+            gap: 12px;
+            transition: all 0.2s ease;
             position: relative;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
         }
         .sound-card:hover {
             background: var(--card-hover);
-            border-color: #4e5058;
+            border-color: rgba(88, 101, 242, 0.4);
             transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
         }
+        .sound-card.previewing {
+            border-color: var(--success);
+            box-shadow: 0 0 16px var(--success-glow);
+        }
+
         .card-top {
             display: flex;
             align-items: center;
@@ -606,25 +792,32 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
             position: relative;
         }
         .sound-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: 8px;
-            background: #2b2d31;
+            width: 46px;
+            height: 46px;
+            border-radius: 10px;
+            background: #25272c;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
+            font-size: 26px;
             flex-shrink: 0;
             overflow: hidden;
+            border: 1px solid var(--border-subtle);
         }
         .sound-icon img { width: 100%; height: 100%; object-fit: cover; }
-        .sound-info { flex: 1; min-width: 0; padding-right: 24px; }
+        .sound-info {
+            flex: 1;
+            min-width: 0;
+            padding-right: 22px;
+        }
         .sound-name {
-            font-weight: 600;
+            font-weight: 700;
             font-size: 14px;
+            color: #ffffff;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            line-height: 1.25;
         }
         .sound-guild {
             font-size: 11px;
@@ -632,53 +825,91 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            margin-top: 2px;
+            margin-top: 3px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
         .btn-fav {
             position: absolute;
-            top: 0;
+            top: -2px;
             right: 0;
             background: transparent;
             border: none;
-            font-size: 18px;
-            color: #4e5058;
+            font-size: 19px;
+            color: #43464d;
             cursor: pointer;
-            padding: 2px 4px;
+            padding: 2px;
             line-height: 1;
-            transition: all 0.15s;
+            transition: all 0.15s ease;
         }
-        .btn-fav:hover { color: var(--gold); transform: scale(1.2); }
-        .btn-fav.favorited { color: var(--gold); }
-        
+        .btn-fav:hover {
+            color: var(--gold);
+            transform: scale(1.25);
+        }
+        .btn-fav.favorited {
+            color: var(--gold);
+            text-shadow: 0 0 8px var(--gold-glow);
+        }
+
         .card-bottom {
             display: flex;
             gap: 6px;
             margin-top: auto;
-            padding-top: 8px;
-            border-top: 1px solid rgba(255,255,255,0.05);
+            padding-top: 10px;
+            border-top: 1px solid var(--border-subtle);
         }
         .btn-action {
             background: transparent;
             border: 1px solid var(--border);
-            color: var(--text);
-            padding: 6px 8px;
-            border-radius: 6px;
+            color: var(--text-secondary);
+            padding: 7px 8px;
+            border-radius: 8px;
             font-size: 11px;
-            font-weight: 500;
+            font-weight: 600;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 4px;
+            gap: 5px;
             transition: all 0.15s;
             flex: 1;
             white-space: nowrap;
+            outline: none;
         }
-        .btn-preview:hover { background: #3b3e45; border-color: #5865F2; color: #fff; }
-        .btn-voice { background: rgba(88, 101, 242, 0.15); border-color: rgba(88, 101, 242, 0.4); color: #8ea1e1; }
-        .btn-voice:hover { background: var(--accent); border-color: var(--accent); color: white; }
-        .btn-copy:hover { background: #3b3e45; border-color: #949ba4; color: #fff; }
+        .btn-preview:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: #4e525a;
+            color: #fff;
+        }
+        .btn-preview.playing {
+            background: rgba(35, 165, 90, 0.2);
+            border-color: var(--success);
+            color: var(--success);
+        }
+        .btn-voice {
+            background: rgba(88, 101, 242, 0.15);
+            border-color: rgba(88, 101, 242, 0.35);
+            color: #9aa8ed;
+        }
+        .btn-voice:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #ffffff;
+            box-shadow: 0 2px 8px var(--accent-glow);
+        }
+        .btn-copy:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: #4e525a;
+            color: #fff;
+        }
+        .btn-copy.copied {
+            background: rgba(35, 165, 90, 0.2);
+            border-color: var(--success);
+            color: var(--success);
+        }
 
+        /* Toast */
         .toast {
             position: fixed;
             bottom: 24px;
@@ -686,14 +917,17 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
             background: var(--success);
             color: white;
             padding: 12px 20px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-            transform: translateY(100px);
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+            transform: translateY(80px);
             opacity: 0;
-            transition: all 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+            transition: all 0.25s cubic-bezier(0.18, 0.89, 0.32, 1.28);
             z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         .toast.show { transform: translateY(0); opacity: 1; }
     </style>
@@ -702,127 +936,162 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
     <div class="container">
         <header>
             <div class="title-area">
-                <h1 id="txtTitle">🎧 Discord Soundboard</h1>
-                <p id="txtSubtitle">Explore and test all your Discord sounds with live preview.</p>
+                <div class="logo-box">🎧</div>
+                <div class="title-content">
+                    <h1 id="txtTitle">Discord Soundboard</h1>
+                    <p id="txtSubtitle">Sunuculara göre filtreleyin, favorilerinizi belirleyin ve sesleri canlı dinleyin.</p>
+                </div>
             </div>
             <div class="header-actions">
                 <div class="status-badge">
-                    <div class="status-dot" id="statusDot"></div>
-                    <span id="statusText">Connecting...</span>
+                    <div class="status-dot pulsing" id="statusDot"></div>
+                    <span id="statusText">Bağlanıyor...</span>
                 </div>
-                <button class="btn-header" id="langToggleBtn" onclick="toggleLanguage()">
-                    🌐 <span id="langLabel">TR</span>
-                </button>
-                <button class="btn-header" id="btnClose" onclick="closeWindow()" title="Close">
-                    ✕ <span id="txtClose">Close</span>
+                <div class="lang-switch" role="group" aria-label="Language">
+                    <button type="button" class="lang-btn active" id="btnLangTR" onclick="setLanguage('tr')">TR</button>
+                    <button type="button" class="lang-btn" id="btnLangEN" onclick="setLanguage('en')">EN</button>
+                </div>
+                <button type="button" class="btn-close" id="btnClose" onclick="closeWindow()">
+                    ✕ <span id="txtClose">Kapat</span>
                 </button>
             </div>
         </header>
 
         <div class="guide-banner">
-            <div class="guide-icon">💡</div>
-            <div class="guide-text" id="guideBannerText">
-                <strong>Assigning Sounds to Macro Deck:</strong> In the Macro Deck app, click any button → <strong>Add Action</strong> → <strong>Discord Soundboard</strong> → Select <strong>Play Discord Soundboard Sound</strong> to pick your favorite sound with its official emoji icon!
+            <div class="guide-left">
+                <span class="guide-tag" id="guideTag">💡 Hızlı Rehber</span>
+                <div class="guide-steps">
+                    <div class="guide-step">
+                        <span class="step-num">1</span>
+                        <span id="step1">Macro Deck'te Tuşa Tıkla</span>
+                    </div>
+                    <span class="step-arrow">➔</span>
+                    <div class="guide-step">
+                        <span class="step-num">2</span>
+                        <span id="step2">Action Ekle</span>
+                    </div>
+                    <span class="step-arrow">➔</span>
+                    <div class="guide-step">
+                        <span class="step-num">3</span>
+                        <span id="step3">Play Discord Soundboard Sound Seç</span>
+                    </div>
+                </div>
             </div>
+            <div class="guide-hint" id="guideHint">✨ Resmi Discord emojisiyle tuşunuza otomatik atanır!</div>
         </div>
 
         <div class="filter-section">
             <div class="filter-chips">
                 <div class="filter-chip active" data-filter="all" onclick="setFilter('all')">
-                    <span id="txtFilterAll">🌟 All</span> <span class="count-pill" id="countAll">0</span>
+                    <span id="txtFilterAll">🌟 Tümü</span> <span class="count-pill" id="countAll">0</span>
                 </div>
                 <div class="filter-chip" data-filter="favs" onclick="setFilter('favs')">
-                    <span id="txtFilterFavs">⭐ Favorites</span> <span class="count-pill" id="countFavs">0</span>
+                    <span id="txtFilterFavs">⭐ Favorilerim</span> <span class="count-pill" id="countFavs">0</span>
                 </div>
                 <div class="filter-chip" data-filter="default" onclick="setFilter('default')">
-                    <span id="txtFilterDefault">🔊 Discord Default</span> <span class="count-pill" id="countDefault">0</span>
+                    <span id="txtFilterDefault">🔊 Discord Varsayılan</span> <span class="count-pill" id="countDefault">0</span>
                 </div>
             </div>
-            <select class="server-dropdown" id="serverSelect" onchange="onServerSelectChange(this.value)">
-                <option value="">🏰 Filter by Server...</option>
-            </select>
-        </div>
-
-        <div class="toolbar">
-            <input type="text" class="search-box" id="searchInput" placeholder="🔍 Search by sound or server name..." oninput="onSearchInput(this.value)">
+            <div class="filter-right">
+                <select class="server-dropdown" id="serverSelect" onchange="onServerSelectChange(this.value)">
+                    <option value="">🏰 Belirli Bir Sunucu Seç...</option>
+                </select>
+                <div class="search-wrapper">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" class="search-box" id="searchInput" placeholder="Ses veya sunucu ara..." oninput="onSearchInput(this.value)">
+                    <button type="button" class="search-clear" id="searchClear" onclick="clearSearch()">✕</button>
+                </div>
+            </div>
         </div>
 
         <div class="sound-grid" id="soundGrid">
-            <div style="color: var(--muted); grid-column: 1 / -1; text-align: center; padding: 40px;" id="txtGridLoading">
-                Sounds loading...
+            <div style="color: var(--muted); grid-column: 1 / -1; text-align: center; padding: 50px;" id="txtGridLoading">
+                Sesler yükleniyor...
             </div>
         </div>
     </div>
 
-    <div class="toast" id="toast">Notification</div>
+    <div class="toast" id="toast">Bildirim</div>
 
     <script>
         window.__SESSION_TOKEN__ = "{{sessionToken}}";
 
         const i18n = {
             en: {
-                title: "🎧 Discord Soundboard Manager",
+                title: "Discord Soundboard",
                 subtitle: "Explore, filter by server, preview audio, and test-play sounds live.",
                 connecting: "Connecting...",
                 waitingConnection: "Waiting for Connection",
                 connectionError: "Server Connection Error",
                 soundsLoaded: (user, count) => `${user || 'Discord'} (${count} sounds)`,
                 closeBtn: "Close",
+                guideTag: "💡 Quick Guide",
+                step1: "Click Button in Macro Deck",
+                step2: "Add Action",
+                step3: "Pick Play Discord Soundboard Sound",
+                guideHint: "✨ Automatically assigned with its official Discord emoji!",
                 allFilter: "🌟 All",
                 favsFilter: "⭐ Favorites",
                 defaultFilter: "🔊 Discord Default",
                 serverPlaceholder: "🏰 Filter by Server...",
-                searchPlaceholder: "🔍 Search by sound or server name...",
-                guideText: `<strong>Assigning Sounds to Macro Deck:</strong> In Macro Deck, click any button → <strong>Add Action</strong> → <strong>Discord Soundboard</strong> → Select <strong>Play Discord Soundboard Sound</strong> to pick your favorite sound with its official emoji icon!`,
+                searchPlaceholder: "Search sound or server...",
                 emptySounds: "No matching sounds found.",
                 loadingSounds: "Sounds loading...",
                 soundsFetchError: "Could not retrieve sounds. Make sure Discord desktop app is running.",
                 previewBtn: "▶ Preview",
+                previewStopBtn: "⏸ Stop",
                 previewTooltip: "Listen to preview locally",
                 playVoiceBtn: "📢 Play in Voice",
                 playVoiceTooltip: "Play sound live in your active Discord voice channel",
                 copyBtn: "📋 Copy ID",
+                copiedBtn: "✓ Copied!",
                 copyTooltip: "Copy Sound ID to clipboard",
                 addFavTooltip: "Add to Favorites",
                 removeFavTooltip: "Remove from Favorites",
                 toastPlayed: (name) => `"${name}" played in voice channel! 🔊`,
                 toastPlayError: "Could not play sound (are you connected to a Discord voice channel?)",
                 toastPlayReqError: "Failed to send play request.",
-                toastCopied: (id) => `Sound ID copied to clipboard: ${id}`,
+                toastCopied: (name) => `Copied "${name}" Sound ID to clipboard!`,
                 toastConnError: "Could not connect to server.",
                 serverSoundCount: (name, count) => `${name} (${count} sounds)`,
                 defaultGuildName: "Discord (Default)",
                 serverFallback: (id) => `Server (${id})`
             },
             tr: {
-                title: "🎧 Discord Soundboard Yöneticisi",
+                title: "Discord Soundboard",
                 subtitle: "Sunuculara göre filtreleyin, favorilerinizi belirleyin ve sesleri canlı dinleyin.",
                 connecting: "Bağlanıyor...",
                 waitingConnection: "Bağlantı Bekleniyor",
                 connectionError: "Sunucu Bağlantı Hatası",
                 soundsLoaded: (user, count) => `${user || 'Discord'} (${count} ses)`,
                 closeBtn: "Kapat",
+                guideTag: "💡 Hızlı Rehber",
+                step1: "Macro Deck'te Tuşa Tıkla",
+                step2: "Action Ekle",
+                step3: "Play Discord Soundboard Sound Seç",
+                guideHint: "✨ Resmi Discord emojisiyle tuşunuza otomatik atanır!",
                 allFilter: "🌟 Tümü",
                 favsFilter: "⭐ Favorilerim",
                 defaultFilter: "🔊 Discord Varsayılan",
                 serverPlaceholder: "🏰 Belirli Bir Sunucu Seç...",
-                searchPlaceholder: "🔍 Ses veya sunucu adına göre ara...",
-                guideText: `<strong>Macro Deck Tuşuna Atama:</strong> Macro Deck uygulamasında istediğiniz tuşa tıklayın ➔ <strong>Action Ekle</strong> ➔ <strong>Discord Soundboard</strong> ➔ <strong>Play Discord Soundboard Sound</strong> seçerek bu sesi otomatik emojisiyle tuşunuza atayabilirsiniz!`,
+                searchPlaceholder: "Ses veya sunucu ara...",
                 emptySounds: "Eşleşen ses bulunamadı.",
                 loadingSounds: "Sesler yükleniyor...",
                 soundsFetchError: "Sesler alınamadı. Discord uygulamasının açık olduğundan emin olun.",
                 previewBtn: "▶ Önizle",
+                previewStopBtn: "⏸ Durdur",
                 previewTooltip: "Sesi tarayıcıda canlı dinle",
                 playVoiceBtn: "📢 Seste Çal",
                 playVoiceTooltip: "Sesi Discord ses kanalında canlı çal",
                 copyBtn: "📋 ID Kopyala",
+                copiedBtn: "✓ Kopyalandı!",
                 copyTooltip: "Ses ID'sini panoya kopyala",
                 addFavTooltip: "Favorilere Ekle",
                 removeFavTooltip: "Favorilerden Çıkar",
                 toastPlayed: (name) => `"${name}" ses kanalında çalındı! 🔊`,
                 toastPlayError: "Ses çalınamadı (Discord'da ses kanalında mısınız?)",
                 toastPlayReqError: "Çalma isteği iletilemedi.",
-                toastCopied: (id) => `Ses ID panoya kopyalandı: ${id}`,
+                toastCopied: (name) => `"${name}" ses ID'si panoya kopyalandı!`,
                 toastConnError: "Sunucuya bağlanılamadı.",
                 serverSoundCount: (name, count) => `${name} (${count} ses)`,
                 defaultGuildName: "Discord (Varsayılan)",
@@ -830,9 +1099,9 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
             }
         };
 
-        let currentLang = localStorage.getItem('sfx_lang') || (navigator.language.startsWith('tr') ? 'tr' : 'en');
+        let currentLang = localStorage.getItem('sfx_lang') || 'tr';
         function t(key, ...args) {
-            const entry = i18n[currentLang][key];
+            const entry = i18n[currentLang]?.[key];
             if (typeof entry === 'function') return entry(...args);
             return entry || key;
         }
@@ -844,9 +1113,11 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
         let activeGuildId = '';
         let searchQuery = '';
         let currentAudio = null;
+        let playingSoundId = null;
 
         const grid = document.getElementById('soundGrid');
         const searchInput = document.getElementById('searchInput');
+        const searchClear = document.getElementById('searchClear');
         const serverSelect = document.getElementById('serverSelect');
         const toast = document.getElementById('toast');
         const countAll = document.getElementById('countAll');
@@ -905,12 +1176,15 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
             const txt = document.getElementById('statusText');
             if (!lastStatus) {
                 dot.style.background = 'var(--muted)';
+                dot.classList.remove('pulsing');
                 txt.textContent = t('waitingConnection');
             } else if (lastStatus.connected && lastStatus.authenticated) {
                 dot.style.background = 'var(--success)';
+                dot.classList.add('pulsing');
                 txt.textContent = t('soundsLoaded', lastStatus.username, lastStatus.soundCount);
             } else {
                 dot.style.background = 'var(--danger)';
+                dot.classList.remove('pulsing');
                 txt.textContent = t('waitingConnection');
             }
         }
@@ -976,6 +1250,14 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
 
         function onSearchInput(val) {
             searchQuery = (val || '').toLowerCase().trim();
+            searchClear.style.display = searchQuery ? 'block' : 'none';
+            renderGrid();
+        }
+
+        function clearSearch() {
+            searchInput.value = '';
+            searchClear.style.display = 'none';
+            searchQuery = '';
             renderGrid();
         }
 
@@ -1001,7 +1283,7 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
 
             if (filtered.length === 0) {
                 const emptyDiv = document.createElement('div');
-                emptyDiv.style.cssText = 'color: var(--muted); grid-column: 1 / -1; text-align: center; padding: 40px;';
+                emptyDiv.style.cssText = 'color: var(--muted); grid-column: 1 / -1; text-align: center; padding: 50px; font-size: 14px;';
                 emptyDiv.textContent = t('emptySounds');
                 grid.appendChild(emptyDiv);
                 return;
@@ -1009,7 +1291,8 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
 
             filtered.forEach(s => {
                 const card = document.createElement('div');
-                card.className = 'sound-card';
+                card.className = `sound-card ${playingSoundId === s.sound_id ? 'previewing' : ''}`;
+                card.id = `card-${s.sound_id}`;
 
                 const cardTop = document.createElement('div');
                 cardTop.className = 'card-top';
@@ -1077,13 +1360,14 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
                 const cardBottom = document.createElement('div');
                 cardBottom.className = 'card-bottom';
 
+                const isThisPlaying = playingSoundId === s.sound_id;
                 const playPreviewBtn = document.createElement('button');
-                playPreviewBtn.className = 'btn-action btn-preview';
+                playPreviewBtn.className = `btn-action btn-preview ${isThisPlaying ? 'playing' : ''}`;
                 playPreviewBtn.title = t('previewTooltip');
-                playPreviewBtn.textContent = t('previewBtn');
+                playPreviewBtn.textContent = isThisPlaying ? t('previewStopBtn') : t('previewBtn');
                 playPreviewBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    playPreviewAudio(s);
+                    togglePreviewAudio(s, playPreviewBtn, card);
                 });
 
                 const playVoiceBtn = document.createElement('button');
@@ -1117,7 +1401,13 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
                     if (navigator.clipboard && navigator.clipboard.writeText) {
                         navigator.clipboard.writeText(s.sound_id);
                     }
+                    copyBtn.textContent = t('copiedBtn');
+                    copyBtn.classList.add('copied');
                     showToast(t('toastCopied', s.name));
+                    setTimeout(() => {
+                        copyBtn.textContent = t('copyBtn');
+                        copyBtn.classList.remove('copied');
+                    }, 1500);
                 });
 
                 cardBottom.appendChild(playPreviewBtn);
@@ -1130,17 +1420,70 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
             });
         }
 
-        function playPreviewAudio(s) {
+        function togglePreviewAudio(s, btn, card) {
             try {
+                if (currentAudio && playingSoundId === s.sound_id) {
+                    currentAudio.pause();
+                    currentAudio.currentTime = 0;
+                    currentAudio = null;
+                    playingSoundId = null;
+                    btn.textContent = t('previewBtn');
+                    btn.classList.remove('playing');
+                    card.classList.remove('previewing');
+                    return;
+                }
+
                 if (currentAudio) {
                     currentAudio.pause();
                     currentAudio.currentTime = 0;
+                    currentAudio = null;
+                    const prevId = playingSoundId;
+                    playingSoundId = null;
+                    if (prevId) {
+                        const prevCard = document.getElementById(`card-${prevId}`);
+                        if (prevCard) {
+                            prevCard.classList.remove('previewing');
+                            const prevBtn = prevCard.querySelector('.btn-preview');
+                            if (prevBtn) {
+                                prevBtn.textContent = t('previewBtn');
+                                prevBtn.classList.remove('playing');
+                            }
+                        }
+                    }
                 }
+
                 const url = `https://cdn.discordapp.com/soundboard-sounds/${encodeURIComponent(s.sound_id)}`;
                 currentAudio = new Audio(url);
-                currentAudio.volume = 0.8;
+                currentAudio.volume = 0.85;
+                playingSoundId = s.sound_id;
+                btn.textContent = t('previewStopBtn');
+                btn.classList.add('playing');
+                card.classList.add('previewing');
+
+                currentAudio.onended = () => {
+                    playingSoundId = null;
+                    currentAudio = null;
+                    btn.textContent = t('previewBtn');
+                    btn.classList.remove('playing');
+                    card.classList.remove('previewing');
+                };
+
+                currentAudio.onerror = () => {
+                    playingSoundId = null;
+                    currentAudio = null;
+                    btn.textContent = t('previewBtn');
+                    btn.classList.remove('playing');
+                    card.classList.remove('previewing');
+                    showToast(t('toastPlayReqError'), '#da373c');
+                };
+
                 currentAudio.play().catch(e => {
                     console.warn('Audio preview error', e);
+                    playingSoundId = null;
+                    currentAudio = null;
+                    btn.textContent = t('previewBtn');
+                    btn.classList.remove('playing');
+                    card.classList.remove('previewing');
                     showToast(t('toastPlayReqError'), '#da373c');
                 });
             } catch (err) {
@@ -1155,12 +1498,23 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
             window.close();
         }
 
+        function setLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('sfx_lang', currentLang);
+            applyI18n();
+        }
+
         function applyI18n() {
             document.getElementById('txtTitle').textContent = t('title');
             document.getElementById('txtSubtitle').textContent = t('subtitle');
             document.getElementById('txtClose').textContent = t('closeBtn');
-            document.getElementById('langLabel').textContent = currentLang === 'tr' ? 'EN' : 'TR';
-            document.getElementById('guideBannerText').innerHTML = t('guideText');
+            document.getElementById('btnLangTR').classList.toggle('active', currentLang === 'tr');
+            document.getElementById('btnLangEN').classList.toggle('active', currentLang === 'en');
+            document.getElementById('guideTag').textContent = t('guideTag');
+            document.getElementById('step1').textContent = t('step1');
+            document.getElementById('step2').textContent = t('step2');
+            document.getElementById('step3').textContent = t('step3');
+            document.getElementById('guideHint').textContent = t('guideHint');
             document.getElementById('txtFilterAll').textContent = t('allFilter');
             document.getElementById('txtFilterFavs').textContent = t('favsFilter');
             document.getElementById('txtFilterDefault').textContent = t('defaultFilter');
@@ -1169,12 +1523,6 @@ public sealed class SoundboardManagerServer : IAsyncDisposable
             updateStatusBadge();
             populateServerDropdown();
             renderGrid();
-        }
-
-        function toggleLanguage() {
-            currentLang = currentLang === 'tr' ? 'en' : 'tr';
-            localStorage.setItem('sfx_lang', currentLang);
-            applyI18n();
         }
 
         // Initialize on load

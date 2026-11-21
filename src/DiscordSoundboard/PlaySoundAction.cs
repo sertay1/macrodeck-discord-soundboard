@@ -91,16 +91,30 @@ public sealed class PlaySoundAction : IActionDefinition, IDynamicOptionsActionDe
 	public async Task<DynamicOptionsResult> GetDynamicOptionsAsync(DynamicOptionsContext context, CancellationToken cancellationToken)
 	{
 		var sounds = _discordClient.Sounds;
+		if (sounds.Count == 0)
+		{
+			_discordClient.LoadCachedSounds();
+			sounds = _discordClient.Sounds;
+		}
+
 		if (sounds.Count == 0 && _discordClient.IsConnected && _discordClient.IsAuthenticated)
 		{
 			sounds = (await _discordClient.FetchSoundsAsync(cancellationToken)).ToList();
 		}
 
 		var options = sounds
-			.Select(s => new ActionParameterOption
+			.OrderBy(s => string.IsNullOrEmpty(s.GuildName) || s.GuildId == "0" ? " 0_Discord" : s.GuildName)
+			.ThenBy(s => s.Name, StringComparer.CurrentCultureIgnoreCase)
+			.Select(s =>
 			{
-				Value = s.SoundId,
-				Label = LocalizedText.FromLiteral(s.DisplayName)
+				var isDefault = string.IsNullOrEmpty(s.GuildName) || s.GuildId == "0";
+				var guildPart = isDefault ? "[Discord] " : $"[{s.GuildName}] ";
+				var emojiPart = !string.IsNullOrEmpty(s.EmojiName) ? $"{s.EmojiName} " : "";
+				return new ActionParameterOption
+				{
+					Value = s.SoundId,
+					Label = LocalizedText.FromLiteral($"{guildPart}{emojiPart}{s.Name}")
+				};
 			})
 			.ToList();
 
@@ -157,7 +171,10 @@ public sealed class PlaySoundAction : IActionDefinition, IDynamicOptionsActionDe
 					LocalizedText.FromLiteral("Discord is not connected or authenticated. Please verify your plugin settings."));
 			}
 
-			var success = await _discordClient.PlaySoundAsync(soundId, null, context.CancellationToken);
+			var sound = _discordClient.Sounds.FirstOrDefault(s => s.SoundId == soundId);
+			var guildId = sound?.GuildId;
+
+			var success = await _discordClient.PlaySoundAsync(soundId, guildId, context.CancellationToken);
 			if (!success)
 			{
 				return ActionResult.Failed(
